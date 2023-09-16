@@ -77,8 +77,12 @@ func get(cmd *cobra.Command, args []string) error {
 					c.Stderr = os.Stderr
 					return c.Run()
 				} else {
-					// The file is not executable, print it
-					fmt.Println(path)
+					// The file is not executable, print its content
+					b, err := os.ReadFile(path)
+					if err != nil {
+						return err
+					}
+					fmt.Println(string(b))
 				}
 			}
 

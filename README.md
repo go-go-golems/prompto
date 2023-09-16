@@ -8,6 +8,9 @@ necessity for substantial API and documentation during code generation.
 
 To see an example of a repository's `prompto` directory, check out [common-sense](https://github.com/go-go-golems/common-sense/tree/main/prompto/cms).
 
+![image](https://github.com/go-go-golems/prompto/assets/128441/f1549479-e9e5-47a9-9f1e-8832b93fa8ae)
+
+
 ## Why did I write `prompto`?
 
 Prompting LLMs with an exhaustive context derived from API and other technical documents aids in generating precise

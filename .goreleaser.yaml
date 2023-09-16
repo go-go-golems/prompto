@@ -1,4 +1,4 @@
-project_name: XXX
+project_name: prompto
 
 before:
   hooks:
@@ -9,8 +9,8 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
-    main: ./cmd/XXX
-    binary: XXX
+    main: ./cmd/prompto
+    binary: prompto
     goos:
       - linux
 # I am not able to test windows at the time
@@ -27,8 +27,8 @@ changelog:
       - '^docs:'
       - '^test:'
 brews:
-  - name: XXX
-    description: "XXX is a tool"
+  - name: prompto
+    description: "prompto is a tool"
     homepage: "https://github.com/go-go-golems/XXX"
     tap:
       owner: go-go-golems
@@ -44,7 +44,7 @@ nfpms:
     maintainer: Manuel Odendahl <wesen@ruinwesen.com>
 
     description: |-
-      XXX is a tool
+      prompto is a tool to quickly create prompt contexts for LLM prompting.
 
     license: MIT
 

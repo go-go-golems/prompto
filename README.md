@@ -26,6 +26,48 @@ commands).
 Safety is paramount. As `prompto` doesn’t intrinsically verify the safety of the commands it executes, users are
 strongly cautioned against employing `prompto` on repositories not under their direct control.
 
+## Installation
+
+To install the `prompto` command line tool with homebrew, run:
+
+  ```bash
+  brew tap go-go-golems/go-go-go
+  brew install go-go-golems/go-go-go/prompto
+  ```
+
+To install the `prompto` command using apt-get, run:
+
+  ```bash
+  echo "deb [trusted=yes] https://apt.fury.io/go-go-golems/ /" >> /etc/apt/sources.list.d/fury.list
+  apt-get update
+  apt-get install prompto
+  ```
+
+To install using `yum`, run:
+
+  ```bash
+  echo "
+  [fury]
+  name=Gemfury Private Repo
+  baseurl=https://yum.fury.io/go-go-golems/
+  enabled=1
+  gpgcheck=0
+  " >> /etc/yum.repos.d/fury.repo
+yum install prompto
+```
+
+To install using `go get`, run:
+
+```bash
+go get -u github.com/go-go-golems/prompto/cmd/prompto
+```
+
+Finally, you can install by downloading the binaries straight from [github](https://github.com/go-go-golems/prompto/releases).
+
+```
+go get github.com/go-go-golems/prompto
+```
+
 ## Usage
 
 ### Configuring repositories

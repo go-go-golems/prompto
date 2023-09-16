@@ -6,6 +6,8 @@
 Models (LLMs). With its innovative approach, it bridges the gap between the limited context size of LLMs and the
 necessity for substantial API and documentation during code generation.
 
+To see an example of a repository's `prompto` directory, check out [common-sense](https://github.com/go-go-golems/common-sense/tree/main/prompto/cms).
+
 ## Why did I write `prompto`?
 
 Prompting LLMs with an exhaustive context derived from API and other technical documents aids in generating precise

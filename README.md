@@ -2,8 +2,8 @@
 
 ## Overview
 
-`prompto` is a streamlined command-line tool designed to efficiently generate context for prompting Large Language
-Models (LLMs). With its innovative approach, it bridges the gap between the limited context size of LLMs and the
+`prompto` is a command-line tool designed to generate context for prompting Large Language
+Models (LLMs). It bridges the gap between the limited context size of LLMs and the
 necessity for substantial API and documentation during code generation.
 
 To see an example of a repository's `prompto` directory, check out [common-sense](https://github.com/go-go-golems/common-sense/tree/main/prompto/cms).
@@ -15,7 +15,7 @@ To see an example of a repository's `prompto` directory, check out [common-sense
 
 Prompting LLMs with an exhaustive context derived from API and other technical documents aids in generating precise
 code. Manually copying and pasting the appropriate context from source files can be laborious. Though tools
-like [oak](https://github.com/go-go-golems/oak) facilitate tree-sitter queries on codebases, there's often a need to run
+like [oak](https://github.com/go-go-golems/oak) facilitate by using tree-sitter queries on codebases, there's often a need to run
 diverse sets of queries on distinct parts of the codebase. Using custom shell scripts to compile this information became
 a cumbersome chore, especially when extracting contexts from multiple repositories. Enter `prompto`, crafted to
 alleviate these concerns.
@@ -28,7 +28,7 @@ retrievable using the `prompto get` command. In cases where the file is executab
 it. Consequently, this allows users to present both static files (documentation, example data) and dynamic prompts (live
 commands).
 
-Safety is paramount. As `prompto` doesn’t intrinsically verify the safety of the commands it executes, users are
+As `prompto` doesn’t intrinsically verify the safety of the commands it executes, users are
 strongly cautioned against employing `prompto` on repositories not under their direct control.
 
 ## Installation

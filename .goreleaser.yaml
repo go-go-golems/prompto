@@ -30,7 +30,7 @@ brews:
   - name: prompto
     description: "prompto is a tool"
     homepage: "https://github.com/go-go-golems/XXX"
-    tap:
+    repository:
       owner: go-go-golems
       name: homebrew-go-go-go
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"

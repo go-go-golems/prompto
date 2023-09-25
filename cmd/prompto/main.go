@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-go-golems/glazed/pkg/cmds"
+	"github.com/go-go-golems/glazed/pkg/cmds/layers"
+	"github.com/go-go-golems/glazed/pkg/cmds/parameters"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,28 +24,41 @@ const (
 )
 
 type FileInfo struct {
-	Name string
-	Type FileType
+	Name    string
+	Type    FileType
+	Command *cmds.TemplateCommand
 }
 
-func isTemplateCommand(path string) bool {
+func loadTemplateCommand(path string) (*cmds.TemplateCommand, bool) {
 	f, err := os.Open(path)
 	if err != nil {
-		return false
+		return nil, false
 	}
 	defer func(f *os.File) {
 		_ = f.Close()
 	}(f)
 
 	tcl := &cmds.TemplateCommandLoader{}
-	_, err = tcl.LoadCommandFromYAML(f)
-	return err == nil
+	commands, err := tcl.LoadCommandFromYAML(f)
+	if err != nil {
+		return nil, false
+	}
+	if len(commands) != 1 {
+		return nil, false
+	}
+	return commands[0].(*cmds.TemplateCommand), err == nil
 }
 
 func getFilesFromRepo(repo string) ([]FileInfo, error) {
+	promptoDir := filepath.Join(repo, "prompto")
+
+	// check if repo/prompto exists, else return empty list
+	if _, err := os.Stat(promptoDir); os.IsNotExist(err) {
+		return []FileInfo{}, nil
+	}
 	var files []FileInfo
 
-	err := filepath.Walk(filepath.Join(repo, "prompto"), func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(promptoDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -56,8 +72,9 @@ func getFilesFromRepo(repo string) ([]FileInfo, error) {
 
 			if (info.Mode() & 0111) != 0 {
 				file.Type = Executable
-			} else if isTemplateCommand(path) {
+			} else if cmd, ok := loadTemplateCommand(path); ok {
 				file.Type = TemplateCommand
+				file.Command = cmd
 			} else {
 				file.Type = Plain
 			}
@@ -126,14 +143,39 @@ func get(cmd *cobra.Command, args []string) error {
 		for _, file := range files {
 			if file.Name == prompt {
 				path := filepath.Join(repo, "prompto", file.Name)
-				if file.Type == Executable {
+				switch file.Type {
+				case Executable:
 					// The file is executable, execute it
 					c := exec.Command(path, restArgs...)
 					c.Dir = repo
 					c.Stdout = os.Stdout
 					c.Stderr = os.Stderr
 					return c.Run()
-				} else {
+				case TemplateCommand:
+					// The file is a glazed TemplateCommand, execute it by passing the arguments
+					buf := &strings.Builder{}
+					parsedLayers := map[string]*layers.ParsedParameterLayer{}
+					ps, args_, err := parameters.GatherFlagsFromStringList(
+						restArgs, file.Command.Flags,
+						false, false,
+						"")
+					if err != nil {
+						return err
+					}
+					arguments, err := parameters.GatherArguments(args_, file.Command.Arguments, false, false)
+					if err != nil {
+						return err
+					}
+					for p := arguments.Oldest(); p != nil; p = p.Next() {
+						k, v := p.Key, p.Value
+						ps[k] = v
+					}
+					err = file.Command.RunIntoWriter(context.Background(), parsedLayers, ps, buf)
+					if err != nil {
+						return err
+					}
+					fmt.Println(buf.String())
+				case Plain:
 					// The file is not executable, print its content
 					b, err := os.ReadFile(path)
 					if err != nil {

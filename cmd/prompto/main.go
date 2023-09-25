@@ -69,12 +69,20 @@ func getFilesFromRepo(repo string) ([]FileInfo, error) {
 
 		if !info.IsDir() {
 			file := FileInfo{Name: name}
+			ext := strings.ToLower(filepath.Ext(name))
+
+			isYAMLfile := ext == ".yaml" || ext == ".yml"
 
 			if (info.Mode() & 0111) != 0 {
 				file.Type = Executable
-			} else if cmd, ok := loadTemplateCommand(path); ok {
-				file.Type = TemplateCommand
-				file.Command = cmd
+			} else if isYAMLfile {
+				if cmd, ok := loadTemplateCommand(path); ok {
+					file.Name = name[:len(name)-len(ext)]
+					file.Type = TemplateCommand
+					file.Command = cmd
+				} else {
+					file.Type = Plain
+				}
 			} else {
 				file.Type = Plain
 			}

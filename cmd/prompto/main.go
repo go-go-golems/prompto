@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-go-golems/glazed/pkg/cmds"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,6 +11,69 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+type FileType int
+
+const (
+	Plain FileType = iota
+	Executable
+	TemplateCommand
+)
+
+type FileInfo struct {
+	Name string
+	Type FileType
+}
+
+func isTemplateCommand(path string) bool {
+	f, err := os.Open(path)
+	if err != nil {
+		return false
+	}
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
+
+	tcl := &cmds.TemplateCommandLoader{}
+	_, err = tcl.LoadCommandFromYAML(f)
+	return err == nil
+}
+
+func getFilesFromRepo(repo string) ([]FileInfo, error) {
+	var files []FileInfo
+
+	err := filepath.Walk(filepath.Join(repo, "prompto"), func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// strip the repo path from the file name
+		relpath := path[len(repo):]
+		name := strings.TrimPrefix(relpath, "/prompto/")
+
+		if !info.IsDir() {
+			file := FileInfo{Name: name}
+
+			if (info.Mode() & 0111) != 0 {
+				file.Type = Executable
+			} else if isTemplateCommand(path) {
+				file.Type = TemplateCommand
+			} else {
+				file.Type = Plain
+			}
+
+			files = append(files, file)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
 
 func main() {
 	var rootCmd = &cobra.Command{
@@ -54,22 +118,15 @@ func get(cmd *cobra.Command, args []string) error {
 	repositories := viper.GetStringSlice("repositories")
 
 	for _, repo := range repositories {
-		if _, err := os.Stat(filepath.Join(repo, "prompto")); os.IsNotExist(err) {
-			continue
+		files, err := getFilesFromRepo(repo)
+		if err != nil {
+			return err
 		}
 
-		err := filepath.Walk(filepath.Join(repo, "prompto"), func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-
-			// strip the repo path from the file name
-			relpath := path[len(repo):]
-			name := strings.TrimPrefix(relpath, "/prompto/")
-
-			// compare prompt with the stripped filename
-			if !info.IsDir() && name == prompt {
-				if (info.Mode() & 0111) != 0 {
+		for _, file := range files {
+			if file.Name == prompt {
+				path := filepath.Join(repo, "prompto", file.Name)
+				if file.Type == Executable {
 					// The file is executable, execute it
 					c := exec.Command(path, restArgs...)
 					c.Dir = repo
@@ -85,12 +142,6 @@ func get(cmd *cobra.Command, args []string) error {
 					fmt.Println(string(b))
 				}
 			}
-
-			return nil
-		})
-
-		if err != nil {
-			return err
 		}
 	}
 
@@ -101,29 +152,13 @@ func list(cmd *cobra.Command, args []string) error {
 	repositories := viper.GetStringSlice("repositories")
 
 	for _, repo := range repositories {
-		// skip if directory doesn't exist
-		if _, err := os.Stat(filepath.Join(repo, "prompto")); os.IsNotExist(err) {
-			continue
-		}
-
-		err := filepath.Walk(filepath.Join(repo, "prompto"), func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-
-			// strip the repo path from the file name
-			relpath := path[len(repo):]
-			name := strings.TrimPrefix(relpath, "/prompto/")
-
-			if !info.IsDir() {
-				fmt.Println(repo, name)
-			}
-
-			return nil
-		})
-
+		files, err := getFilesFromRepo(repo)
 		if err != nil {
 			return err
+		}
+
+		for _, file := range files {
+			fmt.Println(repo, file.Name)
 		}
 	}
 

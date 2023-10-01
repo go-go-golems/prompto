@@ -63,6 +63,14 @@ func getFilesFromRepo(repo string) ([]FileInfo, error) {
 			return err
 		}
 
+		// skip . files and directories
+		if strings.HasPrefix(info.Name(), ".") {
+			if info.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
 		// strip the repo path from the file name
 		relpath := path[len(repo):]
 		name := strings.TrimPrefix(relpath, "/prompto/")

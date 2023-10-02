@@ -76,23 +76,35 @@ func getFilesFromRepo(repo string) ([]FileInfo, error) {
 		name := strings.TrimPrefix(relpath, "/prompto/")
 
 		if !info.IsDir() {
-			file := FileInfo{Name: name}
+			file := FileInfo{Name: name, Type: Plain}
 			ext := strings.ToLower(filepath.Ext(name))
 
 			isYAMLfile := ext == ".yaml" || ext == ".yml"
 
-			if (info.Mode() & 0111) != 0 {
-				file.Type = Executable
-			} else if isYAMLfile {
-				if cmd, ok := loadTemplateCommand(path); ok {
-					file.Name = name[:len(name)-len(ext)]
-					file.Type = TemplateCommand
-					file.Command = cmd
-				} else {
-					file.Type = Plain
+			// check for symbolic link
+			if info.Mode()&os.ModeSymlink != 0 {
+				// check if the link source is executable
+				info_, err := os.Stat(path)
+				if err != nil {
+					return err
+				}
+				if (info_.Mode() & 0111) != 0 {
+					file.Type = Executable
 				}
 			} else {
-				file.Type = Plain
+				if (info.Mode() & 0111) != 0 {
+					file.Type = Executable
+				}
+			}
+
+			if file.Type != Executable {
+				if isYAMLfile {
+					if cmd, ok := loadTemplateCommand(path); ok {
+						file.Name = name[:len(name)-len(ext)]
+						file.Type = TemplateCommand
+						file.Command = cmd
+					}
+				}
 			}
 
 			files = append(files, file)

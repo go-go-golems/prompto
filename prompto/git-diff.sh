@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 # Default values
 branch="origin/main"
 exclude_files=()

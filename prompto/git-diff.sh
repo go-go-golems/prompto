@@ -73,9 +73,9 @@ fi
 # Construct the exclusion patterns
 exclude_patterns=""
 for file in "${exclude_files[@]}"; do
-#  exclude_patterns+=" :!$file"
-  # while we're printing, add quotes
   exclude_patterns+=" :!$file"
+  # while we're printing, add quotes
+  # exclude_patterns+=" ':!$file'"
 done
 
 # Construct the inclusion patterns

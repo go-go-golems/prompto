@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 # Default values
 branch="origin/main"
 exclude_files=()
@@ -69,7 +71,9 @@ fi
 # Construct the exclusion patterns
 exclude_patterns=""
 for file in "${exclude_files[@]}"; do
-  exclude_patterns+=" :!$file"
+#  exclude_patterns+=" :!$file"
+  # while we're printing, add quotes
+  exclude_patterns+=" ':!$file'"
 done
 
 # Construct the inclusion patterns
@@ -81,5 +85,7 @@ if [ -n "$include_paths" ]; then
   done
 fi
 
+pwd
 # Run git diff command
-git diff "$context_size" "$branch" -- . $exclude_patterns $include_patterns
+echo cd "$PROMPTO_PARENT_PWD"
+cd "$PROMPTO_PARENT_PWD" && pwd && git diff "$context_size" "$branch" -- . $exclude_patterns $include_patterns

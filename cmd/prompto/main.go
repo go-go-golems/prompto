@@ -178,6 +178,17 @@ func get(cmd *cobra.Command, args []string) error {
 					c.Dir = repo
 					c.Stdout = os.Stdout
 					c.Stderr = os.Stderr
+
+					// Get the current working directory
+					currentDir, err := os.Getwd()
+					if err != nil {
+						// Handle error
+						return err
+					}
+
+					// Set the PROMPTO_PARENT_PWD environment variable to the current directory
+					c.Env = append(os.Environ(), "PROMPTO_PARENT_PWD="+currentDir)
+
 					return c.Run()
 				case TemplateCommand:
 					// The file is a glazed TemplateCommand, execute it by passing the arguments

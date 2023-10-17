@@ -47,6 +47,10 @@ while [[ $# -gt 0 ]]; do
       shift
       shift
       ;;
+    --no-tests)
+      exclude_files+=("*.test.js" "*.test.ts" "*.spec.js" "*.spec.ts" "*_test.go")
+      shift
+      ;;
     --no-package)
       exclude_package=true
       shift
@@ -70,6 +74,8 @@ fi
 exclude_patterns=""
 for file in "${exclude_files[@]}"; do
   exclude_patterns+=" :!$file"
+  # while we're printing, add quotes
+  # exclude_patterns+=" ':!$file'"
 done
 
 # Construct the inclusion patterns
@@ -81,5 +87,7 @@ if [ -n "$include_paths" ]; then
   done
 fi
 
+pwd
 # Run git diff command
-git diff "$context_size" "$branch" -- . $exclude_patterns $include_patterns
+#echo git diff "$context_size" "$branch" -- . $exclude_patterns $include_patterns
+cd "$PROMPTO_PARENT_PWD" && pwd && git diff "$context_size" "$branch" -- . $exclude_patterns $include_patterns

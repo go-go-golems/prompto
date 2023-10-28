@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: '>=1.19.5'
+          # See https://chat.openai.com/share/588cab85-27f5-4378-8eeb-5700221e5614
+          cache: false
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.1.2
         with:

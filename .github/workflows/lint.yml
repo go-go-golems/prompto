@@ -28,6 +28,6 @@ jobs:
           # See https://chat.openai.com/share/588cab85-27f5-4378-8eeb-5700221e5614
           cache: false
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3.1.2
+        uses: golangci/golangci-lint-action@v3.1.0
         with:
           args: --timeout=5m

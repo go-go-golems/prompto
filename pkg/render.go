@@ -5,7 +5,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-go-golems/glazed/pkg/cmds/layers"
-	"github.com/go-go-golems/glazed/pkg/cmds/parameters"
+	parameters2 "github.com/go-go-golems/glazed/pkg/cmds/parameters"
+	"gopkg.in/errgo.v2/fmt/errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -41,23 +42,52 @@ func RenderFile(repo string, file FileInfo, restArgs []string) (string, error) {
 	case TemplateCommand:
 		// The file is a glazed TemplateCommand, execute it by passing the arguments
 		buf := &strings.Builder{}
-		parsedLayers := map[string]*layers.ParsedParameterLayer{}
-		ps, args_, err := parameters.GatherFlagsFromStringList(
-			restArgs, file.Command.Flags,
-			false, false,
-			"")
+
+		parsedLayers := layers.NewParsedLayers()
+		err := file.Command.Layers.ForEachE(func(_ string, l layers.ParameterLayer) error {
+			parameters := l.GetParameterDefinitions()
+
+			parsedFlags, args_, err := parameters.GatherFlagsFromStringList(
+				restArgs, false, false, "",
+				parameters2.WithParseStepSource("command-line"),
+			)
+			if err != nil {
+				return err
+			}
+
+			arguments := parameters2.NewParsedParameters()
+			if len(args_) > 0 {
+				if l.GetSlug() != layers.DefaultSlug {
+					return errors.Newf("layer %s does not accept arguments (only default layer can)", l.GetSlug())
+				}
+
+				argumentDefinitions := file.Command.GetDefaultArguments()
+				arguments, err = argumentDefinitions.GatherArguments(
+					args_, false, false,
+					parameters2.WithParseStepSource("cli"),
+				)
+				if err != nil {
+					return err
+				}
+			}
+
+			parsedLayer, err := layers.NewParsedLayer(l,
+				layers.WithParsedParameters(parsedFlags),
+				layers.WithParsedParameters(arguments),
+			)
+			if err != nil {
+				return err
+			}
+
+			parsedLayers.Set(l.GetSlug(), parsedLayer)
+
+			return nil
+		})
 		if err != nil {
 			return "", err
 		}
-		arguments, err := parameters.GatherArguments(args_, file.Command.Arguments, false, false)
-		if err != nil {
-			return "", err
-		}
-		for p := arguments.Oldest(); p != nil; p = p.Next() {
-			k, v := p.Key, p.Value
-			ps[k] = v
-		}
-		err = file.Command.RunIntoWriter(context.Background(), parsedLayers, ps, buf)
+
+		err = file.Command.RunIntoWriter(context.Background(), parsedLayers, buf)
 		if err != nil {
 			return "", err
 		}

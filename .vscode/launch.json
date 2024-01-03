@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+
+    {
+      "name": "Prompto List",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/cmd/prompto",
+      "args": ["list"],
+      "env": {},
+      "cwd": "${workspaceFolder}",
+      "showLog": true
+    }
+  ]
+}

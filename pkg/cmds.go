@@ -1,10 +1,11 @@
 package pkg
 
 import (
-	"github.com/go-go-golems/glazed/pkg/cmds"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/go-go-golems/glazed/pkg/cmds"
 )
 
 type FileType int
@@ -64,8 +65,9 @@ func GetFilesFromRepo(repo string) ([]FileInfo, error) {
 		}
 
 		// strip the repo path from the file name
-		relpath := path[len(repo):]
-		name := strings.TrimPrefix(relpath, "/prompto/")
+		relpath := strings.TrimPrefix(path, repo)
+		relpath = strings.TrimPrefix(relpath, "/")
+		name := strings.TrimPrefix(relpath, "prompto/")
 
 		if !info.IsDir() {
 			file := FileInfo{Name: name, Type: Plain}
@@ -77,6 +79,7 @@ func GetFilesFromRepo(repo string) ([]FileInfo, error) {
 			if info.Mode()&os.ModeSymlink != 0 {
 				// check if the link source is executable
 				info_, err := os.Stat(path)
+
 				if err != nil {
 					return err
 				}

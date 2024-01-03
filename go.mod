@@ -3,9 +3,10 @@ module github.com/go-go-golems/prompto
 go 1.20
 
 require (
-	github.com/go-go-golems/glazed v0.4.26
+	github.com/go-go-golems/glazed v0.5.0
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
+	gopkg.in/errgo.v2 v2.1.0
 )
 
 require (

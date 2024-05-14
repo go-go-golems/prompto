@@ -3,10 +3,9 @@ package pkg
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"github.com/go-go-golems/glazed/pkg/cmds/layers"
 	parameters2 "github.com/go-go-golems/glazed/pkg/cmds/parameters"
-	"gopkg.in/errgo.v2/fmt/errors"
+	"github.com/pkg/errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -58,7 +57,7 @@ func RenderFile(repo string, file FileInfo, restArgs []string) (string, error) {
 			arguments := parameters2.NewParsedParameters()
 			if len(args_) > 0 {
 				if l.GetSlug() != layers.DefaultSlug {
-					return errors.Newf("layer %s does not accept arguments (only default layer can)", l.GetSlug())
+					return errors.Errorf("layer %s does not accept arguments (only default layer can)", l.GetSlug())
 				}
 
 				argumentDefinitions := file.Command.GetDefaultArguments()
@@ -101,5 +100,5 @@ func RenderFile(repo string, file FileInfo, restArgs []string) (string, error) {
 		return string(b), nil
 	}
 
-	return "", fmt.Errorf("unsupported file type: %v", file.Type)
+	return "", errors.Errorf("unsupported file type: %v", file.Type)
 }

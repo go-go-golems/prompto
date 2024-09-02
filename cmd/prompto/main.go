@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/go-go-golems/glazed/pkg/help"
 	"github.com/go-go-golems/prompto/cmd/prompto/cmds"
+	"github.com/go-go-golems/prompto/pkg/doc"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 func main() {
@@ -19,12 +21,15 @@ and looks for a file that matches the prompt.`,
 
 	helpSystem := help.NewHelpSystem()
 	helpSystem.SetupCobraRootCommand(rootCmd)
+	err := doc.AddDocToHelpSystem(helpSystem)
+	cobra.CheckErr(err)
 
 	rootCmd.AddCommand(cmds.NewGetCommand())
 	rootCmd.AddCommand(cmds.NewListCommand())
 	command, err := cmds.NewConfigGroupCommand(helpSystem)
 	cobra.CheckErr(err)
 	rootCmd.AddCommand(command)
+	rootCmd.AddCommand(cmds.NewServeCommand())
 
 	viper.SetConfigName("config")
 	viper.AddConfigPath(os.ExpandEnv("$HOME/.prompto"))

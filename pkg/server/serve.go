@@ -42,28 +42,28 @@ func (s *ServerState) LoadRepositories() error {
 	return nil
 }
 
-func (s *ServerState) CreateTemplateWithFuncs(name, tmpl string, state *ServerState) (*template.Template, error) {
+func (s *ServerState) CreateTemplateWithFuncs(name, tmpl string) (*template.Template, error) {
 	funcMap := template.FuncMap{
 		"PromptosByGroup": func(group string) []pkg.Prompto {
-			return state.GetPromptosByGroup(group)
+			return s.GetPromptosByGroup(group)
 		},
 		"AllRepositories": func() []string {
-			return state.GetAllRepositories()
+			return s.GetAllRepositories()
 		},
 		"AllPromptos": func() []pkg.Prompto {
-			return state.GetAllPromptos()
+			return s.GetAllPromptos()
 		},
 		"AllGroups": func() []string {
-			return state.GetAllGroups()
+			return s.GetAllGroups()
 		},
 		"PromptosByRepository": func(repo string) []pkg.Prompto {
-			return state.GetPromptosByRepository(repo)
+			return s.GetPromptosByRepository(repo)
 		},
 		"GroupsByRepository": func(repo string) []string {
-			return state.GetGroupsByRepository(repo)
+			return s.GetGroupsByRepository(repo)
 		},
 		"PromptosForRepositoryAndGroup": func(repo, group string) []pkg.Prompto {
-			return state.GetPromptosForRepositoryAndGroup(repo, group)
+			return s.GetPromptosForRepositoryAndGroup(repo, group)
 		},
 	}
 

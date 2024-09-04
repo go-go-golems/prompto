@@ -1,10 +1,12 @@
 package server
 
 import (
-	"github.com/go-go-golems/prompto/pkg"
+	"fmt"
 	"html/template"
 	"net/http"
 	"strings"
+
+	"github.com/go-go-golems/prompto/pkg"
 )
 
 func promptHandler(state *ServerState) http.HandlerFunc {
@@ -61,7 +63,21 @@ func promptHandler(state *ServerState) http.HandlerFunc {
 			return
 		}
 
-		content, err := foundFile.Render(foundFile.Repository, []string{})
+		// Extract URL parameters
+		queryParams := r.URL.Query()
+		var restArgs []string
+		for key, values := range queryParams {
+			for _, value := range values {
+				if value == "" {
+					// pass non-keyword arguments as a straight string
+					restArgs = append(restArgs, key)
+				} else {
+					restArgs = append(restArgs, fmt.Sprintf("--%s", key), value)
+				}
+			}
+		}
+
+		content, err := foundFile.Render(foundFile.Repository, restArgs)
 		if err != nil {
 			http.Error(w, "Error rendering prompt", http.StatusInternalServerError)
 			return

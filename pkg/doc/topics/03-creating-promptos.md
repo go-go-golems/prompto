@@ -31,7 +31,17 @@ There are three main types of promptos:
 
 ## Creating Promptos
 
-All promptos should be placed in the `prompto/` directory of your repository. Ensure that your repository is added to your `prompto` configuration.
+All promptos should be placed in the `prompto/` directory of your repository. Ensure that your repository is added to your `prompto` configuration. 
+
+Promptos are placed under a subdirectory of the `prompto/` directory. For example:
+
+```
+prompto/
+├── test/
+│   ├── foobar.md
+│   └── foobar.sh
+│   └── greeting.yaml
+```
 
 ### 1. Static File Prompto
 

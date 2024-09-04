@@ -59,12 +59,10 @@ func searchHandler(state *ServerState) http.HandlerFunc {
 		results := make(map[string][]pkg.Prompto)
 
 		state.mu.RLock()
-		for _, files := range state.Files {
-			for _, file := range files {
-				if strings.Contains(strings.ToLower(file.Name), strings.ToLower(query)) {
-					group := strings.SplitN(file.Name, "/", 2)[0]
-					results[group] = append(results[group], file)
-				}
+		for _, file := range state.GetAllPromptos() {
+			if strings.Contains(strings.ToLower(file.Name), strings.ToLower(query)) {
+				group := strings.SplitN(file.Name, "/", 2)[0]
+				results[group] = append(results[group], file)
 			}
 		}
 		state.mu.RUnlock()

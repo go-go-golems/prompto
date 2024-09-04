@@ -1,6 +1,9 @@
 package pkg
 
 import (
+	"context"
+	"github.com/go-go-golems/clay/pkg/watcher"
+	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -125,4 +128,25 @@ func (r *Repository) GetPromptosByGroup(group string) []Prompto {
 		return promptos[i].Name < promptos[j].Name
 	})
 	return promptos
+}
+
+func (r *Repository) Watch(ctx context.Context, options ...watcher.Option) error {
+	options = append(options,
+		watcher.WithWriteCallback(func(path string) error {
+			log.Debug().Msgf("Loading %s", path)
+			return r.LoadPromptos()
+		}),
+		watcher.WithRemoveCallback(func(path string) error {
+			log.Debug().Msgf("Removing %s", path)
+			return r.LoadPromptos()
+		}),
+		watcher.WithPaths(r.Path),
+	)
+
+	w := watcher.NewWatcher(options...)
+	err := w.Run(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }

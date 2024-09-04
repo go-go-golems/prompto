@@ -13,12 +13,14 @@ func NewServeCommand() *cobra.Command {
 	}
 
 	cmd.Flags().Int("port", 8080, "Port to run the server on")
+	cmd.Flags().Bool("watching", true, "Watch for changes to the repositories")
 
 	return cmd
 }
 
 func serve(cmd *cobra.Command, args []string) error {
 	port, _ := cmd.Flags().GetInt("port")
+	watching, _ := cmd.Flags().GetBool("watching")
 
-	return server.Serve(port)
+	return server.Serve(port, watching)
 }

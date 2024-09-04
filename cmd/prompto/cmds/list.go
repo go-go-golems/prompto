@@ -18,14 +18,15 @@ func NewListCommand() *cobra.Command {
 func list(cmd *cobra.Command, args []string) error {
 	repositories := viper.GetStringSlice("repositories")
 
-	for _, repo := range repositories {
-		files, err := pkg.GetFilesFromRepo(repo)
+	for _, repoPath := range repositories {
+		repo := pkg.NewRepository(repoPath)
+		err := repo.LoadPromptos()
 		if err != nil {
 			return err
 		}
 
-		for _, file := range files {
-			fmt.Println(repo, file.Name)
+		for _, file := range repo.Promptos {
+			fmt.Println(repoPath, file.Name)
 		}
 	}
 

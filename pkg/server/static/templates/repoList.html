@@ -1,0 +1,14 @@
+{{define "repoList"}}
+	{{range $group := .Groups}}
+		<h2>{{.}}</h2>
+		<ul>
+			{{ range (PromptosByGroup $group) }}
+				<li>
+					<a href="/prompts/{{.Name}}">{{.Name}}</a>
+					<span class="clipboard-icon" onclick="copyToClipboard('/prompts/{{.Name}}')">📋</span>
+					<span class="add-icon" onclick="addToFavorites('{{.Name}}')">+</span>
+				</li>
+			{{end}}
+		</ul>
+	{{end}}
+{{end}}

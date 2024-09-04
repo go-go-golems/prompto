@@ -14,7 +14,7 @@ Flags:
 - --print-path
 IsTopLevel: false
 ShowPerDefault: false
-SectionType: CommandUsage
+SectionType: Example
 ---
 
 Prompto is a command line tool that generates prompts from a list of repositories.

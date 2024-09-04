@@ -27,17 +27,18 @@ func NewGetCommand() *cobra.Command {
 
 func interactiveGet() error {
 	repositories := viper.GetStringSlice("repositories")
-	var allFiles []pkg.FileInfo
+	var allFiles []pkg.Prompto
 	var selectedPrompt string
 	var searchTerm string
 
 	// Gather all files from repositories
-	for _, repo := range repositories {
-		files, err := pkg.GetFilesFromRepo(repo)
+	for _, repoPath := range repositories {
+		repo := pkg.NewRepository(repoPath)
+		err := repo.LoadPromptos()
 		if err != nil {
 			return err
 		}
-		allFiles = append(allFiles, files...)
+		allFiles = append(allFiles, repo.Promptos...)
 	}
 
 	form := huh.NewForm(
@@ -73,8 +74,8 @@ func interactiveGet() error {
 	for _, file := range allFiles {
 		if file.Name == selectedPrompt {
 			// Find the repository for this file
-			for _, repo := range repositories {
-				s, err := pkg.RenderFile(repo, file, []string{})
+			for _, repoPath := range repositories {
+				s, err := file.Render(repoPath, []string{})
 				if err == nil {
 					fmt.Println(s)
 					return nil
@@ -99,21 +100,22 @@ func get(cmd *cobra.Command, args []string) error {
 
 	repositories := viper.GetStringSlice("repositories")
 
-	for _, repo := range repositories {
-		files, err := pkg.GetFilesFromRepo(repo)
+	for _, repoPath := range repositories {
+		repo := pkg.NewRepository(repoPath)
+		err := repo.LoadPromptos()
 		if err != nil {
 			return err
 		}
 
-		for _, file := range files {
+		for _, file := range repo.Promptos {
 			if file.Name == prompt {
 				if printPath {
 					if file.Type == pkg.Plain {
-						fmt.Println(filepath.Join(repo, "prompto", file.Name))
+						fmt.Println(filepath.Join(repoPath, "prompto", file.Name))
 						continue
 					}
 
-					s, err := pkg.RenderFile(repo, file, restArgs)
+					s, err := file.Render(repoPath, restArgs)
 					if err != nil {
 						return err
 					}
@@ -145,7 +147,7 @@ func get(cmd *cobra.Command, args []string) error {
 
 					continue
 				}
-				s, err := pkg.RenderFile(repo, file, restArgs)
+				s, err := file.Render(repoPath, restArgs)
 				if err != nil {
 					return err
 				}

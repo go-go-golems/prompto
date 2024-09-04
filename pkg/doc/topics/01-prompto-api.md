@@ -28,9 +28,7 @@ Install Prompto using Go:
 go get github.com/go-go-golems/prompto
 ```
 
-## Usage
-
-### Configuration
+## Configuration
 
 Create a `~/.prompto/config.yaml` file to specify repositories:
 
@@ -40,51 +38,134 @@ repositories:
   - /path/to/repo2
 ```
 
-### Creating Prompts
+## Core Structures
 
-In each repository, create a `prompto/` directory and add files or executable scripts.
+### Repository
+
+The `Repository` struct represents a repository containing prompts:
+
+```go
+type Repository struct {
+    Path     string
+    Promptos []Prompto
+}
+```
+
+### Prompto
+
+The `Prompto` struct represents an individual prompt:
+
+```go
+type Prompto struct {
+    Name       string
+    Group      string
+    Type       FileType
+    Command    *cmds.TemplateCommand
+    FilePath   string
+    Repository string
+}
+```
 
 ## Core Functions
 
-Prompto provides three main functions:
+### Repository Methods
 
-1. List available prompts (`GetFilesFromRepo`)
-2. Load and execute prompts (`LoadTemplateCommand`)
-3. Render files (`RenderFile`)
+1. `NewRepository(path string) *Repository`
+   - Creates a new Repository instance.
 
-### GetFilesFromRepo
+2. `(r *Repository) LoadPromptos() error`
+   - Loads all prompts from the repository.
 
-This function retrieves all prompt files from a specified repository.
+3. `(r *Repository) Refresh() error`
+   - Reloads all prompts from the repository.
+
+4. `(r *Repository) GroupPromptos() map[string][]Prompto`
+   - Groups prompts by their group name.
+
+5. `(r *Repository) GetGroups() []string`
+   - Returns a sorted list of all group names in the repository.
+
+6. `(r *Repository) GetPromptosByGroup(group string) []Prompto`
+   - Returns a sorted list of prompts for a specific group.
+
+7. `(r *Repository) Watch(ctx context.Context, options ...watcher.Option) error`
+   - Sets up a file watcher for the repository to automatically reload prompts on changes.
+
+### Prompto Methods
+
+1. `(p *Prompto) Render(repo string, restArgs []string) (string, error)`
+   - Renders the prompt with the given arguments.
+
+### Utility Functions
+
+1. `LoadTemplateCommand(path string) (*cmds.TemplateCommand, bool)`
+   - Loads a template command from a YAML file.
+
+## Server Usage
+
+Prompto includes a server component for serving prompts via HTTP:
 
 ```go
-func GetFilesFromRepo(repo string) ([]FileInfo, error) {
-    // Implementation details...
+func Serve(port int, watching bool) error
+```
+
+This function sets up an HTTP server with the following endpoints:
+
+- `/`: Root handler
+- `/prompts/`: Prompt handler
+- `/search`: Search handler
+- `/refresh`: Refresh handler
+- `/repositories`: Repositories handler
+
+The server uses a `ServerState` struct to manage the state of repositories and prompts:
+
+```go
+type ServerState struct {
+    Repositories []string
+    Repos        map[string]*pkg.Repository
+    mu           sync.RWMutex
+    Watching     bool
 }
 ```
 
-### LoadTemplateCommand
+### ServerState Methods
 
-This function loads a template command from a YAML file.
+1. `NewServerState(watching bool) *ServerState`
+   - Creates a new ServerState instance.
 
-```go
-func LoadTemplateCommand(path string) (*cmds.TemplateCommand, bool) {
-    // Implementation details...
-}
-```
+2. `(s *ServerState) LoadRepositories() error`
+   - Loads all repositories specified in the configuration.
 
-### RenderFile
+3. `(s *ServerState) CreateTemplateWithFuncs(name, tmpl string) (*template.Template, error)`
+   - Creates an HTML template with custom functions for rendering prompts and repositories.
 
-This function renders a prompt file with given arguments.
+4. `(s *ServerState) GetAllRepositories() []string`
+   - Returns a list of all repository paths.
 
-```go
-func RenderFile(repo string, file FileInfo, args []string) (string, error) {
-    // Implementation details...
-}
-```
+5. `(s *ServerState) GetAllPromptos() []pkg.Prompto`
+   - Returns a sorted list of all prompts across all repositories.
+
+6. `(s *ServerState) GetAllGroups() []string`
+   - Returns a sorted list of all unique group names across all repositories.
+
+7. `(s *ServerState) GetPromptosByGroup(group string) []pkg.Prompto`
+   - Returns a sorted list of prompts for a specific group across all repositories.
+
+8. `(s *ServerState) GetPromptosByRepository(repo string) []pkg.Prompto`
+   - Returns all prompts for a specific repository.
+
+9. `(s *ServerState) GetGroupsByRepository(repo string) []string`
+   - Returns all groups for a specific repository.
+
+10. `(s *ServerState) GetPromptosForRepositoryAndGroup(repo, group string) []pkg.Prompto`
+    - Returns all prompts for a specific repository and group.
+
+11. `(s *ServerState) WatchRepositories(ctx context.Context) error`
+    - Sets up file watchers for all repositories if watching is enabled.
 
 ## Example Usage
 
-Here's an example of how to use Prompto's core functions:
+Here's an example of how to use Prompto to render a prompt:
 
 ```go
 import (
@@ -92,29 +173,51 @@ import (
     "github.com/go-go-golems/prompto/pkg"
 )
 
-func renderPrompt(repo, promptName string, args []string) error {
-    files, err := pkg.GetFilesFromRepo(repo)
+func main() {
+    repo := pkg.NewRepository("/path/to/repository")
+    err := repo.LoadPromptos()
     if err != nil {
-        return err
+        fmt.Printf("Error loading prompts: %v\n", err)
+        return
     }
 
-    for _, file := range files {
-        if file.Name == promptName {
-            s, err := pkg.RenderFile(repo, file, args)
-            if err != nil {
-                return err
-            }
-            fmt.Println(s)
-            return nil
+    promptos := repo.GetPromptosByGroup("example-group")
+    if len(promptos) > 0 {
+        result, err := promptos[0].Render(repo.Path, []string{"arg1", "arg2"})
+        if err != nil {
+            fmt.Printf("Error rendering prompt: %v\n", err)
+            return
         }
+        fmt.Println(result)
     }
-
-    return fmt.Errorf("prompt not found")
 }
 ```
 
 This example demonstrates how to:
-1. Get files from a repository using `pkg.GetFilesFromRepo`
-2. Find a specific prompt file
-3. Render the file using `pkg.RenderFile`
-4. Print the rendered content
+1. Create a new Repository
+2. Load prompts from the repository
+3. Get prompts for a specific group
+4. Render a prompt with arguments
+
+For server usage, you can start the Prompto server like this:
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/go-go-golems/prompto/pkg/server"
+)
+
+func main() {
+    port := 8080
+    watching := true
+
+    err := server.Serve(port, watching)
+    if err != nil {
+        fmt.Printf("Error starting server: %v\n", err)
+    }
+}
+```
+
+This will start a server on port 8080, watching for changes in the repositories if `watching` is set to `true`.

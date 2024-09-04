@@ -77,14 +77,20 @@ go get github.com/go-go-golems/prompto
 
 ### Configuring repositories
 
-To configure the repositories for scanning, edit the `~/.prompto/config.yaml`:
+To configure the repositories for scanning, you can use the following commands:
 
-```yaml
-repositories:
-  - /path/to/repo1
-  - /path/to/repo2
-  ...
+```bash
+# Add repositories
+prompto config repositories add /path/to/repo1 /path/to/repo2
+
+# Remove repositories
+prompto config repositories remove /path/to/repo1
+
+# List configured repositories
+prompto config repositories get
 ```
+
+These commands will update the `~/.prompto/config.yaml` file automatically.
 
 ### Creating prompts in a repository
 
@@ -95,21 +101,50 @@ Place any desired files (documentation, example data) or executable scripts with
 
 To view all available prompts, use:
 
-```
-❯ prompto list
+```bash
+prompto list
 ```
 
 ### Getting a prompt context
 
 To retrieve the context from a specific prompt, use:
 
+```bash
+prompto get [prompt-name]
 ```
-❯ prompto get [prompt-name]
+
+### Web Interface
+
+Prompto also provides a web interface for easier access to your prompts. To start the web server, use:
+
+```bash
+prompto serve
 ```
+
+This will start a local web server, typically on `http://localhost:8080`.
+
+#### Using with Cursor IDE
+
+You can make your Prompto server publicly accessible using ngrok, which is particularly useful when working with Cursor IDE:
+
+1. Install ngrok (if not already installed): https://ngrok.com/download
+2. Start your Prompto server: `prompto serve`
+3. In a new terminal, run: `ngrok http 8080`
+4. Copy the HTTPS URL provided by ngrok (e.g., `https://abcd1234.ngrok.io`)
+
+Now you can easily use your Prompto prompts in Cursor IDE:
+
+1. In Cursor, open the AI command palette (Cmd+Shift+P on Mac, Ctrl+Shift+P on Windows/Linux)
+2. Type: `/prompto get [prompt-name]`
+3. Replace `[prompt-name]` with your desired prompt
+4. Paste the ngrok URL before the prompt name, like this:
+   `/https://abcd1234.ngrok.io/prompts/[prompt-name]`
+
+This allows you to access your Prompto prompts directly from Cursor IDE, making it easy to include relevant context in your development workflow.
 
 ### Safety considerations
 
-Always ensure that repositories added to `prompto` are safe and trusted. As `prompto` doesn’t inherently verify the
+Always ensure that repositories added to `prompto` are safe and trusted. As `prompto` doesn't inherently verify the
 safety of executed commands, it's vital to be cautious and avoid using repositories that may contain malicious content.
 
 ## Examples

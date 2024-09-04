@@ -97,7 +97,9 @@ These commands will update the `~/.prompto/config.yaml` file automatically.
 
 ### Creating Prompts in a Repository
 
-For `prompto` to recognize prompts within a repository, create a `prompto/` directory at the root of the repository. Place any desired files (documentation, example data) or executable scripts within this directory.
+For `prompto` to recognize prompts within a repository, create a `prompto/` directory at the root of the repository. Place any desired files (documentation, example data) or executable scripts within this directory, under a subdirectory.
+
+For more information, run `prompto help create-promptos`.
 
 ### Listing Available Prompts
 
@@ -127,7 +129,7 @@ This will start a local web server, typically on `http://localhost:8080`.
 
 #### Using with Cursor IDE
 
-Run `prompto help cursor-setup` to get started.
+For using prompto with cursor, run `prompto help cursor-setup`.
 
 ## Safety Considerations
 

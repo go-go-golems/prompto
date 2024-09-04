@@ -95,7 +95,9 @@ These commands will update the `~/.prompto/config.yaml` file automatically.
 ### Creating prompts in a repository
 
 For `prompto` to recognize prompts within a repository, create a `prompto/` directory at the root of the repository.
-Place any desired files (documentation, example data) or executable scripts within this directory.
+Place any desired files (documentation, example data) or executable scripts within this directory, under a subdirectory.
+
+For more information, see [Creating Promptos](03-creating-promptos.md) or run `prompto help create-promptos`.
 
 ### Listing available prompts
 
@@ -125,24 +127,7 @@ This will start a local web server, typically on `http://localhost:8080`.
 
 #### Using with Cursor IDE
 
-You can make your Prompto server publicly accessible using ngrok, which is particularly useful when working with Cursor IDE:
-
-1. Install ngrok (if not already installed): https://ngrok.com/download
-2. Start your Prompto server: `prompto serve`
-3. In a new terminal, run: `ngrok http 8080`
-4. Copy the HTTPS URL provided by ngrok (e.g., `https://abcd1234.ngrok.io`)
-
-Now you can easily use your Prompto prompts in Cursor IDE. First, navigate to your prompto in the web interface and copy the URL.
-Then, in Cursor's chat or composer, paste the URL as additional context.
-
-This allows you to access your Prompto prompts directly from Cursor IDE, making it easy to include relevant context in
-your development workflow.
-
-This will start a local web server, typically on `http://localhost:8080`.
-
-#### Using with Cursor IDE
-
-Run `prompto help cursor-setup` to get started.
+For using prompto with cursor, see [Cursor Setup](02-cursor-setup.md) or run `prompto help cursor-setup`.
 
 ### Safety considerations
 

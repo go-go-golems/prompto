@@ -138,6 +138,12 @@ Then, in Cursor's chat or composer, paste the URL as additional context.
 This allows you to access your Prompto prompts directly from Cursor IDE, making it easy to include relevant context in
 your development workflow.
 
+This will start a local web server, typically on `http://localhost:8080`.
+
+#### Using with Cursor IDE
+
+Run `prompto help cursor-setup` to get started.
+
 ### Safety considerations
 
 Always ensure that repositories added to `prompto` are safe and trusted. As `prompto` doesn't inherently verify the

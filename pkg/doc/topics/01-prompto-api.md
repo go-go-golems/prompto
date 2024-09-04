@@ -1,15 +1,11 @@
 ---
 Title: How to use prompto's API
-Slug: prompto-api
+Slug: api
 Short: How to use prompto's API to build application rendering prompts.
 Topics:
 - prompto
 - development
 - api
-Commands:
-- GetFilesFromRepo
-- LoadTemplateCommand
-- RenderFile
 IsTopLevel: true
 IsTemplate: false
 ShowPerDefault: true

@@ -132,15 +132,11 @@ You can make your Prompto server publicly accessible using ngrok, which is parti
 3. In a new terminal, run: `ngrok http 8080`
 4. Copy the HTTPS URL provided by ngrok (e.g., `https://abcd1234.ngrok.io`)
 
-Now you can easily use your Prompto prompts in Cursor IDE:
+Now you can easily use your Prompto prompts in Cursor IDE. First, navigate to your prompto in the web interface and copy the URL.
+Then, in Cursor's chat or composer, paste the URL as additional context.
 
-1. In Cursor, open the AI command palette (Cmd+Shift+P on Mac, Ctrl+Shift+P on Windows/Linux)
-2. Type: `/prompto get [prompt-name]`
-3. Replace `[prompt-name]` with your desired prompt
-4. Paste the ngrok URL before the prompt name, like this:
-   `/https://abcd1234.ngrok.io/prompts/[prompt-name]`
-
-This allows you to access your Prompto prompts directly from Cursor IDE, making it easy to include relevant context in your development workflow.
+This allows you to access your Prompto prompts directly from Cursor IDE, making it easy to include relevant context in
+your development workflow.
 
 ### Safety considerations
 

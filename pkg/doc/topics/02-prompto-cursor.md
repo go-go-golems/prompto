@@ -89,13 +89,19 @@ mkdir /path/to/your/repository/prompto
 Write your dynamic prompts as executable scripts in this directory. For example:
 
 ```bash
-vim /path/to/your/repository/prompto/example-prompt.sh
+vim /path/to/your/repository/prompto/foobar/example-prompt.sh
 ```
 
 Make the script executable:
 
 ```bash
-chmod +x /path/to/your/repository/prompto/example-prompt.sh
+chmod +x /path/to/your/repository/prompto/foobar/example-prompt.sh
+```
+
+Your prompto is now available as:
+
+```bash
+prompto get foobar/example-prompt.sh
 ```
 
 Remember, these scripts will be executed in your repository's working directory.

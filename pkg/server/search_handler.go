@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/go-go-golems/prompto/pkg"
 	"html/template"
 	"net/http"
 	"strings"
@@ -8,8 +9,13 @@ import (
 
 func searchHandler(state *ServerState) http.HandlerFunc {
 	tmpl := template.Must(template.New("searchResults").Parse(`
-		{{range .}}
-			<li><a href="/prompts/{{.Repo}}/{{.Name}}">{{.Repo}}/{{.Name}}</a></li>
+		{{range $group, $promptos := .}}
+			<h2>{{$group}}</h2>
+			<ul>
+				{{range $promptos}}
+					<li><a href="/prompts/{{.Name}}">{{.Name}}</a></li>
+				{{end}}
+			</ul>
 		{{else}}
 			<li>No results found</li>
 		{{end}}
@@ -22,22 +28,14 @@ func searchHandler(state *ServerState) http.HandlerFunc {
 		}
 
 		query := r.FormValue("search")
-		results := []struct {
-			Repo string
-			Name string
-		}{}
+		results := make(map[string][]pkg.Prompto)
 
 		state.mu.RLock()
-		for repo, files := range state.Files {
+		for _, files := range state.Files {
 			for _, file := range files {
 				if strings.Contains(strings.ToLower(file.Name), strings.ToLower(query)) {
-					results = append(results, struct {
-						Repo string
-						Name string
-					}{
-						Repo: repo,
-						Name: file.Name,
-					})
+					group := strings.SplitN(file.Name, "/", 2)[0]
+					results[group] = append(results[group], file)
 				}
 			}
 		}

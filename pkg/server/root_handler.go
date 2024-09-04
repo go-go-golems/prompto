@@ -1,12 +1,11 @@
 package server
 
 import (
-	"html/template"
 	"net/http"
 )
 
 func rootHandler(state *ServerState) http.HandlerFunc {
-	tmpl := template.Must(template.New("root").Parse(`
+	tmplStr := `
 		<!DOCTYPE html>
 		<html lang="en">
 		<head>
@@ -33,15 +32,20 @@ func rootHandler(state *ServerState) http.HandlerFunc {
 					   hx-target="#repo-list"
 					   hx-indicator=".htmx-indicator">
 				<span class="htmx-indicator">Searching...</span>
-				<ul id="repo-list">
-					{{range .Repositories}}
-						<li><a href="/prompts/{{.}}/">{{.}}</a></li>
+				<div id="repo-list">
+					{{range $group := .Groups}}
+						<h2>{{.}}</h2>
+						<ul>
+							{{ range (PromptosByGroup $group) }}
+								<li><a href="/prompts/{{.Name}}">{{.Name}}</a></li>
+							{{end}}
+						</ul>
 					{{end}}
-				</ul>
+				</div>
 			</div>
 		</body>
 		</html>
-	`))
+	`
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
@@ -49,8 +53,21 @@ func rootHandler(state *ServerState) http.HandlerFunc {
 			return
 		}
 
+		// Use the CreateTemplateWithFuncs method from ServerState
+		tmpl, err := state.CreateTemplateWithFuncs("root", tmplStr, state)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			Groups []string
+		}{
+			Groups: state.GetAllGroups(),
+		}
+
 		w.Header().Set("Content-Type", "text/html")
-		err := tmpl.Execute(w, state)
+		err = tmpl.Execute(w, data)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -2,12 +2,13 @@ package pkg
 
 import (
 	"context"
-	"github.com/go-go-golems/clay/pkg/watcher"
-	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/go-go-golems/clay/pkg/watcher"
+	"github.com/rs/zerolog/log"
 )
 
 type Repository struct {
@@ -61,10 +62,11 @@ func (r *Repository) LoadPromptos() error {
 			if info.Mode()&os.ModeSymlink != 0 {
 				info_, err := os.Stat(path)
 				if err != nil {
-					return err
-				}
-				if (info_.Mode() & 0111) != 0 {
-					prompto.Type = Executable
+					log.Warn().Err(err).Str("path", path).Msg("Failed to stat symlink target")
+				} else {
+					if (info_.Mode() & 0111) != 0 {
+						prompto.Type = Executable
+					}
 				}
 				prompto.Group = group
 			} else {

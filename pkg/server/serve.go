@@ -156,8 +156,7 @@ func (s *ServerState) WatchRepositories(ctx context.Context) error {
 		return nil
 	}
 
-	for _, repoPath := range s.Repositories {
-		repo := pkg.NewRepository(repoPath)
+	for repoPath, repo := range s.Repos {
 		options := []watcher.Option{
 			watcher.WithWriteCallback(func(path string) error {
 				log.Info().Msgf("File %s changed, reloading...", path)

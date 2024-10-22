@@ -13,22 +13,25 @@ import (
 
 type Repository struct {
 	Path     string
-	Promptos []Prompto
+	Promptos map[string]Prompto
 }
 
 func NewRepository(path string) *Repository {
-	return &Repository{Path: path}
+	return &Repository{
+		Path:     path,
+		Promptos: make(map[string]Prompto),
+	}
 }
 
 func (r *Repository) LoadPromptos() error {
 	promptoDir := filepath.Join(r.Path, "prompto")
 
 	if _, err := os.Stat(promptoDir); os.IsNotExist(err) {
-		r.Promptos = []Prompto{}
+		r.Promptos = make(map[string]Prompto)
 		return nil
 	}
 
-	var promptos []Prompto
+	newPromptos := make(map[string]Prompto)
 
 	err := filepath.Walk(promptoDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -42,51 +45,12 @@ func (r *Repository) LoadPromptos() error {
 			return nil
 		}
 
-		relpath := strings.TrimPrefix(path, r.Path)
-		relpath = strings.TrimPrefix(relpath, "/")
-		name := strings.TrimPrefix(relpath, "prompto/")
-		group := strings.SplitN(name, "/", 2)[0]
-
-		if !info.IsDir() {
-			prompto := Prompto{
-				Name:       name,
-				Group:      group,
-				Type:       Plain,
-				FilePath:   path,   // Store absolute file path
-				Repository: r.Path, // Store repository
-			}
-			ext := strings.ToLower(filepath.Ext(name))
-
-			isYAMLfile := ext == ".yaml" || ext == ".yml"
-
-			if info.Mode()&os.ModeSymlink != 0 {
-				info_, err := os.Stat(path)
-				if err != nil {
-					log.Warn().Err(err).Str("path", path).Msg("Failed to stat symlink target")
-				} else {
-					if (info_.Mode() & 0111) != 0 {
-						prompto.Type = Executable
-					}
-				}
-				prompto.Group = group
-			} else {
-				if (info.Mode() & 0111) != 0 {
-					prompto.Type = Executable
-				}
-				prompto.Group = group
-			}
-
-			if prompto.Type != Executable {
-				if isYAMLfile {
-					if cmd, ok := LoadTemplateCommand(path); ok {
-						prompto.Name = name[:len(name)-len(ext)]
-						prompto.Type = TemplateCommand
-						prompto.Command = cmd
-					}
-				}
-			}
-
-			promptos = append(promptos, prompto)
+		prompto, err := r.loadSinglePrompto(path, info)
+		if err != nil {
+			return err
+		}
+		if prompto != nil {
+			newPromptos[prompto.FilePath] = *prompto
 		}
 
 		return nil
@@ -96,7 +60,87 @@ func (r *Repository) LoadPromptos() error {
 		return err
 	}
 
-	r.Promptos = promptos
+	r.Promptos = newPromptos
+	return nil
+}
+
+func (r *Repository) GetPromptos() []Prompto {
+	var promptos []Prompto
+	for _, prompto := range r.Promptos {
+		promptos = append(promptos, prompto)
+	}
+	return promptos
+}
+
+func (r *Repository) loadSinglePrompto(path string, info os.FileInfo) (*Prompto, error) {
+	if info.IsDir() {
+		return nil, nil
+	}
+
+	relpath := strings.TrimPrefix(path, r.Path)
+	relpath = strings.TrimPrefix(relpath, "/")
+	name := strings.TrimPrefix(relpath, "prompto/")
+	group := strings.SplitN(name, "/", 2)[0]
+
+	prompto := &Prompto{
+		Name:       name,
+		Group:      group,
+		Type:       Plain,
+		FilePath:   path,
+		Repository: r.Path,
+	}
+
+	ext := strings.ToLower(filepath.Ext(name))
+	isYAMLfile := ext == ".yaml" || ext == ".yml"
+
+	if info.Mode()&os.ModeSymlink != 0 {
+		info_, err := os.Stat(path)
+		if err != nil {
+			log.Warn().Err(err).Str("path", path).Msg("Failed to stat symlink target")
+		} else {
+			if (info_.Mode() & 0111) != 0 {
+				prompto.Type = Executable
+			}
+		}
+		prompto.Group = group
+	} else {
+		if (info.Mode() & 0111) != 0 {
+			prompto.Type = Executable
+		}
+		prompto.Group = group
+	}
+
+	if prompto.Type != Executable && isYAMLfile {
+		if cmd, ok := LoadTemplateCommand(path); ok {
+			prompto.Name = name[:len(name)-len(ext)]
+			prompto.Type = TemplateCommand
+			prompto.Command = cmd
+		}
+	}
+
+	return prompto, nil
+}
+
+func (r *Repository) AddPrompto(path string) error {
+	info, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+
+	prompto, err := r.loadSinglePrompto(path, info)
+	if err != nil {
+		return err
+	}
+
+	if prompto != nil {
+		r.Promptos[prompto.FilePath] = *prompto
+	}
+
+	return nil
+}
+
+func (r *Repository) RemovePrompto(path string) error {
+	delete(r.Promptos, path)
 	return nil
 }
 

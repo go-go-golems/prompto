@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"path/filepath"
 	"sort"
 	"sync"
 
@@ -60,7 +61,7 @@ func (s *ServerState) CreateTemplateWithFuncs(name, tmpl string) (*template.Temp
 			return s.GetAllGroups()
 		},
 		"PromptosByRepository": func(repo string) []pkg.Prompto {
-			return s.GetPromptosByRepository(repo)
+			return s.Repos[repo].GetPromptos()
 		},
 		"GroupsByRepository": func(repo string) []string {
 			return s.GetGroupsByRepository(repo)
@@ -87,7 +88,7 @@ func (s *ServerState) GetAllPromptos() []pkg.Prompto {
 
 	var allPromptos []pkg.Prompto
 	for _, repo := range s.Repos {
-		allPromptos = append(allPromptos, repo.Promptos...)
+		allPromptos = append(allPromptos, repo.GetPromptos()...)
 	}
 
 	sort.Slice(allPromptos, func(i, j int) bool {
@@ -133,12 +134,6 @@ func (s *ServerState) GetPromptosByGroup(group string) []pkg.Prompto {
 	return groupPromptos
 }
 
-func (s *ServerState) GetPromptosByRepository(repo string) []pkg.Prompto {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.Repos[repo].Promptos
-}
-
 func (s *ServerState) GetGroupsByRepository(repo string) []string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -162,15 +157,15 @@ func (s *ServerState) WatchRepositories(ctx context.Context) error {
 				log.Info().Msgf("File %s changed, reloading...", path)
 				s.mu.Lock()
 				defer s.mu.Unlock()
-				return repo.LoadPromptos()
+				return repo.AddPrompto(path)
 			}),
 			watcher.WithRemoveCallback(func(path string) error {
-				log.Info().Msgf("File %s removed, reloading...", path)
+				log.Info().Msgf("File %s removed, removing from repository...", path)
 				s.mu.Lock()
 				defer s.mu.Unlock()
-				return repo.LoadPromptos()
+				return repo.RemovePrompto(path)
 			}),
-			watcher.WithPaths(repoPath + "/prompto"),
+			watcher.WithPaths(filepath.Join(repoPath, "prompto")),
 		}
 
 		w := watcher.NewWatcher(options...)

@@ -38,7 +38,7 @@ func interactiveGet() error {
 		if err != nil {
 			return err
 		}
-		allFiles = append(allFiles, repo.Promptos...)
+		allFiles = append(allFiles, repo.GetPromptos()...)
 	}
 
 	form := huh.NewForm(

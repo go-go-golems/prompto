@@ -87,7 +87,11 @@ if [ -n "$include_paths" ]; then
   done
 fi
 
-pwd
-# Run git diff command
-echo git diff -w "$context_size" "$branch" -- . $exclude_patterns $include_patterns
-cd "$PROMPTO_PARENT_PWD" && pwd && git diff -w "$context_size" "$branch" -- . $exclude_patterns $include_patterns
+cd "$PROMPTO_PARENT_PWD" 
+# Print git diff summary with --stat
+echo git diff --stat "$branch" -- . $exclude_patterns $include_patterns
+git diff --stat "$branch" -- . $exclude_patterns $include_patterns
+
+# Run git diff command with diff-filter=d to exclude deleted files
+echo git diff -w "$context_size" "$branch" --diff-filter=d -- . $exclude_patterns $include_patterns
+cd "$PROMPTO_PARENT_PWD" && pwd && git diff -w "$context_size" "$branch" --diff-filter=d -- . $exclude_patterns $include_patterns

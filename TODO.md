@@ -1,0 +1,9 @@
+- [ ] add an interactive mode to get which asks for clipboard/etc...
+- [ ] add support for multiple versions of the same prompts / library
+- [ ] add serve config file and maybe use parka for serving
+- [ ] deploy a go go golems prompto in the cloud for reference
+- [ ] add flow to update promptos as packages get updated (for example by linking which things need to be updated how)
+    - [ ] this might need adding metadata to promptos maybe as separate files
+- [ ] integrate catter REST API for stats / file processing
+- [ ] we can maybe rewrite most of the shell scripts into help-system entries if we provide access to oak and other tools
+- [ ] add oak support straight to prompto

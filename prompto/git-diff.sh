@@ -67,13 +67,13 @@ done
 
 # Exclude common package manager files
 if [ "$exclude_package" = true ]; then
-  exclude_files+=("go.mod" "go.sum" "package.json" "package-lock.json" "yarn.lock" "composer.json" "composer.lock" "yarn.lock")
+	exclude_files+=("go.mod" "go.sum" "package.json" "package-lock.json" "yarn.lock" "composer.json" "composer.lock" "yarn.lock", "sorbet")
 fi
 
 # Construct the exclusion patterns
 exclude_patterns=""
 for file in "${exclude_files[@]}"; do
-  exclude_patterns+=" :!*$file"
+  exclude_patterns+=" :!$file"
   # while we're printing, add quotes
   # exclude_patterns+=" ':!$file'"
 done

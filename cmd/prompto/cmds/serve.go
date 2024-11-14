@@ -5,11 +5,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewServeCommand() *cobra.Command {
+type ServeCommand struct {
+	repositories []string
+}
+
+func NewServeCommand(options *CommandOptions) *cobra.Command {
+	serveCmd := &ServeCommand{
+		repositories: options.Repositories,
+	}
+
 	cmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Start a web server to serve prompts",
-		RunE:  serve,
+		RunE:  serveCmd.run,
 	}
 
 	cmd.Flags().Int("port", 8080, "Port to run the server on")
@@ -18,7 +26,7 @@ func NewServeCommand() *cobra.Command {
 	return cmd
 }
 
-func serve(cmd *cobra.Command, args []string) error {
+func (s *ServeCommand) run(cmd *cobra.Command, args []string) error {
 	port, _ := cmd.Flags().GetInt("port")
 	watching, _ := cmd.Flags().GetBool("watching")
 

@@ -47,18 +47,22 @@ func main() {
 	err = doc.AddDocToHelpSystem(helpSystem)
 	cobra.CheckErr(err)
 
-	rootCmd.AddCommand(cmds.NewGetCommand())
-	rootCmd.AddCommand(cmds.NewListCommand())
-	command, err := cmds.NewConfigGroupCommand(helpSystem)
-	cobra.CheckErr(err)
-	rootCmd.AddCommand(command)
-	rootCmd.AddCommand(cmds.NewServeCommand())
-
 	viper.SetConfigName("config")
 	viper.AddConfigPath(os.ExpandEnv("$HOME/.prompto"))
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf("Error reading config file, %s", err)
 	}
+
+	repositories := viper.GetStringSlice("repositories")
+	options := cmds.NewCommandOptions(repositories)
+
+	for _, cmd := range cmds.NewCommands(options) {
+		rootCmd.AddCommand(cmd)
+	}
+
+	configCmd, err := cmds.NewConfigGroupCommand(helpSystem)
+	cobra.CheckErr(err)
+	rootCmd.AddCommand(configCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

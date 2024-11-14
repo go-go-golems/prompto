@@ -10,14 +10,21 @@ import (
 	files2 "github.com/go-go-golems/glazed/pkg/helpers/files"
 	"github.com/go-go-golems/prompto/pkg"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-func NewGetCommand() *cobra.Command {
+type GetCommand struct {
+	repositories []string
+}
+
+func NewGetCommand(options *CommandOptions) *cobra.Command {
+	getCmd := &GetCommand{
+		repositories: options.Repositories,
+	}
+
 	cmd := &cobra.Command{
 		Use:   "get prompt [args]",
 		Short: "Get and execute or print a file",
-		RunE:  get,
+		RunE:  getCmd.run,
 	}
 
 	cmd.Flags().Bool("print-path", false, "Print the path of the prompt")
@@ -25,14 +32,13 @@ func NewGetCommand() *cobra.Command {
 	return cmd
 }
 
-func interactiveGet() error {
-	repositories := viper.GetStringSlice("repositories")
+func (g *GetCommand) interactiveGet() error {
 	var allFiles []pkg.Prompto
 	var selectedPrompt string
 	var searchTerm string
 
 	// Gather all files from repositories
-	for _, repoPath := range repositories {
+	for _, repoPath := range g.repositories {
 		repo := pkg.NewRepository(repoPath)
 		err := repo.LoadPromptos()
 		if err != nil {
@@ -74,7 +80,7 @@ func interactiveGet() error {
 	for _, file := range allFiles {
 		if file.Name == selectedPrompt {
 			// Find the repository for this file
-			for _, repoPath := range repositories {
+			for _, repoPath := range g.repositories {
 				s, err := file.Render(repoPath, []string{})
 				if err == nil {
 					fmt.Println(s)
@@ -88,9 +94,9 @@ func interactiveGet() error {
 	return fmt.Errorf("selected prompt not found")
 }
 
-func get(cmd *cobra.Command, args []string) error {
+func (g *GetCommand) run(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
-		return interactiveGet()
+		return g.interactiveGet()
 	}
 
 	prompt := args[0]
@@ -98,9 +104,7 @@ func get(cmd *cobra.Command, args []string) error {
 
 	printPath, _ := cmd.Flags().GetBool("print-path")
 
-	repositories := viper.GetStringSlice("repositories")
-
-	for _, repoPath := range repositories {
+	for _, repoPath := range g.repositories {
 		repo := pkg.NewRepository(repoPath)
 		err := repo.LoadPromptos()
 		if err != nil {

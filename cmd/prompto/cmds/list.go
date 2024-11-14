@@ -4,21 +4,26 @@ import (
 	"fmt"
 	"github.com/go-go-golems/prompto/pkg"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-func NewListCommand() *cobra.Command {
+type ListCommand struct {
+	repositories []string
+}
+
+func NewListCommand(options *CommandOptions) *cobra.Command {
+	listCmd := &ListCommand{
+		repositories: options.Repositories,
+	}
+
 	return &cobra.Command{
 		Use:   "list",
 		Short: "List all prompts in the repositories",
-		RunE:  list,
+		RunE:  listCmd.run,
 	}
 }
 
-func list(cmd *cobra.Command, args []string) error {
-	repositories := viper.GetStringSlice("repositories")
-
-	for _, repoPath := range repositories {
+func (l *ListCommand) run(cmd *cobra.Command, args []string) error {
+	for _, repoPath := range l.repositories {
 		repo := pkg.NewRepository(repoPath)
 		err := repo.LoadPromptos()
 		if err != nil {

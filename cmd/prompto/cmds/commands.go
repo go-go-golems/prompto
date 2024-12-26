@@ -21,5 +21,6 @@ func NewCommands(options *CommandOptions) []*cobra.Command {
 		NewGetCommand(options),
 		NewListCommand(options),
 		NewServeCommand(options),
+		NewWhichCommand(options),
 	}
 }

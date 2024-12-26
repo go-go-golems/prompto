@@ -67,7 +67,7 @@ done
 
 # Exclude common package manager files
 if [ "$exclude_package" = true ]; then
-	exclude_files+=("go.mod" "go.sum" "package.json" "package-lock.json" "yarn.lock" "composer.json" "composer.lock" "yarn.lock", "sorbet")
+	exclude_files+=("go.mod" "go.sum" "package.json" "package-lock.json" "yarn.lock" "composer.json" "composer.lock" "yarn.lock", "sorbet", "*.min.js")
 fi
 
 # Construct the exclusion patterns

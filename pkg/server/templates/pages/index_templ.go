@@ -79,24 +79,11 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var3 string
-					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(repo)
+					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(group)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 42, Col: 35}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 42, Col: 36}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" - ")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var4 string
-					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(group)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 42, Col: 47}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -109,8 +96,8 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						var templ_7745c5c3_Var5 templ.SafeURL = templ.SafeURL("/prompts/" + prompt.Name)
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var5)))
+						var templ_7745c5c3_Var4 templ.SafeURL = templ.SafeURL("/prompts/" + prompt.Name)
+						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var4)))
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -118,12 +105,12 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						var templ_7745c5c3_Var6 string
-						templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.Name)
+						var templ_7745c5c3_Var5 string
+						templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.Name)
 						if templ_7745c5c3_Err != nil {
 							return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 49, Col: 26}
 						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -139,8 +126,8 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						var templ_7745c5c3_Var7 templ.ComponentScript = copyToClipboard(prompt.Name)
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7.Call)
+						var templ_7745c5c3_Var6 templ.ComponentScript = copyToClipboard(prompt.Name)
+						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6.Call)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -156,8 +143,8 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						var templ_7745c5c3_Var8 templ.ComponentScript = addToFavorites(prompt.Name)
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8.Call)
+						var templ_7745c5c3_Var7 templ.ComponentScript = addToFavorites(prompt.Name)
+						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7.Call)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -172,7 +159,7 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 					}
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"col-12 col-lg-4\"><div id=\"prompt-content\" class=\"card\"><div class=\"card-body\"><p class=\"text-muted\">Select a prompt to view its details</p></div></div></div></div><script>\n\t\t\tfunction copyToClipboard(text) {\n\t\t\t\tnavigator.clipboard.writeText(text).then(() => {\n\t\t\t\t\t// Could add a toast notification here\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tfunction addToFavorites(name) {\n\t\t\t\t// TODO: Implement favorites functionality\n\t\t\t}\n\t\t</script>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"col-12 col-lg-4\"><div id=\"prompt-content\" class=\"card\"><div class=\"card-body\"><p class=\"text-muted\">Select a prompt to view its details</p></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

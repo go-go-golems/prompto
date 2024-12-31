@@ -31,8 +31,10 @@ func Serve(port int, watching bool, repositories []string) error {
 	// Set up routes
 	mux := http.NewServeMux()
 	mux.Handle("/", h.Index())
-	mux.Handle("/prompts/", h.PromptList())
+	mux.Handle("/prompts/{name...}", h.PromptContent())
 	mux.Handle("/search", h.Search())
+	mux.Handle("/refresh", h.Refresh())
+	mux.Handle("/repositories", h.Repositories())
 
 	// Serve static files
 	fs := http.FileServer(http.Dir("pkg/server/static"))

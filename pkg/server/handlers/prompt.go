@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -8,7 +9,20 @@ import (
 	"github.com/go-go-golems/prompto/pkg"
 	"github.com/go-go-golems/prompto/pkg/server/templates/components"
 	"github.com/rs/zerolog/log"
+	"github.com/weaviate/tiktoken-go"
 )
+
+type PromptResponse struct {
+	Name       string `json:"name"`
+	Group      string `json:"group"`
+	Repository string `json:"repository"`
+	Content    string `json:"content"`
+	Stats      struct {
+		Tokens int `json:"tokens"`
+		Lines  int `json:"lines"`
+		Size   int `json:"size"`
+	} `json:"stats"`
+}
 
 func (h *Handlers) PromptList() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -136,6 +150,33 @@ func (h *Handlers) PromptContent() http.HandlerFunc {
 		if err != nil {
 			logger.Debug().Err(err).Msg("error rendering prompt")
 			http.Error(w, "Error rendering prompt", http.StatusInternalServerError)
+			return
+		}
+
+		// Check if JSON is requested
+		if r.Header.Get("Accept") == "application/json" {
+			tokenCounter, err := tiktoken.GetEncoding("cl100k_base")
+			if err != nil {
+				http.Error(w, "Error initializing token counter", http.StatusInternalServerError)
+				return
+			}
+
+			tokens := tokenCounter.Encode(content, nil, nil)
+			response := PromptResponse{
+				Name:       foundFile.Name,
+				Group:      group,
+				Repository: foundFile.Repository,
+				Content:    content,
+			}
+			response.Stats.Tokens = len(tokens)
+			response.Stats.Lines = strings.Count(content, "\n") + 1
+			response.Stats.Size = len(content)
+
+			w.Header().Set("Content-Type", "application/json")
+			err = json.NewEncoder(w).Encode(response)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			return
 		}
 

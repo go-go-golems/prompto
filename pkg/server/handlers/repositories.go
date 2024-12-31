@@ -1,15 +1,13 @@
-package server
+package handlers
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-func repositoriesHandler(state *ServerState) http.HandlerFunc {
+func (h *Handlers) Repositories() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		state.mu.RLock()
-		repos := state.Repositories
-		state.mu.RUnlock()
+		repos := h.state.GetAllRepositories()
 
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(repos)

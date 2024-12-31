@@ -1,0 +1,69 @@
+package components
+
+import "github.com/go-go-golems/prompto/pkg"
+
+script copyToClipboard(text string) {
+	copyToClipboard(text)
+}
+
+script addToFavorites(name string) {
+	addToFavorites(name)
+}
+
+templ PromptList(prompts []pkg.Prompto) {
+	for _, group := range getGroups(prompts) {
+		<div class="card mb-4">
+			<div class="card-header">
+				<h3 class="h5 mb-0">{ group }</h3>
+			</div>
+			<div class="list-group list-group-flush">
+				for _, prompt := range getPromptsByGroup(prompts, group) {
+					<div class="list-group-item">
+						<div class="d-flex justify-content-between align-items-center">
+							<a href={ templ.SafeURL("/prompts/" + prompt.Name) } class="text-decoration-none">
+								{ prompt.Name }
+							</a>
+							<div>
+								<button
+									class="btn btn-sm btn-outline-secondary me-2"
+									onclick={ copyToClipboard(prompt.Name) }
+								>
+									<i class="bi bi-clipboard"></i>
+								</button>
+								<button
+									class="btn btn-sm btn-outline-primary"
+									onclick={ addToFavorites(prompt.Name) }
+								>
+									<i class="bi bi-plus-lg"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	}
+}
+
+// Helper functions to group prompts
+func getGroups(prompts []pkg.Prompto) []string {
+	groups := make(map[string]bool)
+	var result []string
+	for _, p := range prompts {
+		if !groups[p.Group] {
+			groups[p.Group] = true
+			result = append(result, p.Group)
+		}
+	}
+	return result
+}
+
+func getPromptsByGroup(prompts []pkg.Prompto, group string) []pkg.Prompto {
+	var result []pkg.Prompto
+	for _, p := range prompts {
+		if p.Group == group {
+			result = append(result, p)
+		}
+	}
+	return result
+} 

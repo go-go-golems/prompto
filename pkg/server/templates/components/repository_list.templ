@@ -1,0 +1,32 @@
+package components
+
+import "github.com/go-go-golems/prompto/pkg"
+
+templ RepositoryList(repositories []string, repos map[string]*pkg.Repository) {
+	<div id="repository-list" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+		for _, repoPath := range repositories {
+			<div class="col">
+				<div class="card h-100">
+					<div class="card-body">
+						<h5 class="card-title">{repoPath}</h5>
+						if repo, ok := repos[repoPath]; ok {
+							<div class="list-group mt-3">
+								for _, group := range repo.GetGroups() {
+									<button 
+										class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+										hx-get={"/prompts/" + repoPath + "/" + group}
+										hx-target="#prompt-list"
+										hx-swap="innerHTML"
+									>
+										{group}
+										<i class="bi bi-chevron-right"></i>
+									</button>
+								}
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+} 

@@ -30,5 +30,5 @@ func (s *ServeCommand) run(cmd *cobra.Command, args []string) error {
 	port, _ := cmd.Flags().GetInt("port")
 	watching, _ := cmd.Flags().GetBool("watching")
 
-	return server.Serve(port, watching)
+	return server.Serve(port, watching, s.repositories)
 }

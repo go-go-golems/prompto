@@ -6,28 +6,29 @@ import (
 )
 
 script copyToClipboard(text string) {
-	fetch("/prompts/" + text)
-		.then(response => response.text())
-		.then(content => {
-			navigator.clipboard.writeText(content).then(() => {
-				const toastEl = document.getElementById('copyToast');
-				const toast = new bootstrap.Toast(toastEl);
-				toast.show();
-			});
-		});
+    copyToClipboard(text)
 }
 
 script addToFavorites(name string) {
-	// TODO: Implement favorites functionality
+    addToFavorites(name)
 }
 
 templ Index(repositories []string, repos map[string]*pkg.Repository) {
 	@templates.Layout() {
+		<script src="/static/js/favorites.js"></script>
 		<div class="toast-container position-fixed bottom-0 end-0 p-3">
 			<div id="copyToast" class="toast align-items-center text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
 				<div class="d-flex">
 					<div class="toast-body">
 						<i class="bi bi-clipboard-check me-2"></i>Prompt copied to clipboard!
+					</div>
+					<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+				</div>
+			</div>
+			<div id="favToast" class="toast align-items-center text-bg-primary" role="alert" aria-live="assertive" aria-atomic="true">
+				<div class="d-flex">
+					<div class="toast-body">
+						<i class="bi bi-star-fill me-2"></i>Added to favorites!
 					</div>
 					<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
 				</div>
@@ -88,9 +89,17 @@ templ Index(repositories []string, repos map[string]*pkg.Repository) {
 				</div>
 			</div>
 			<div class="col-12 col-lg-4">
-				<div id="prompt-content" class="card">
+				<div id="prompt-content" class="card mb-4">
 					<div class="card-body">
 						<p class="text-muted">Select a prompt to view its details</p>
+					</div>
+				</div>
+				<div class="card">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h5 class="mb-0">Favorites</h5>
+					</div>
+					<div class="card-body" id="favorites-list">
+						<p class="text-muted mb-0">No favorites yet</p>
 					</div>
 				</div>
 			</div>

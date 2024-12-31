@@ -1,36 +1,70 @@
-// static/js/favorites.js
-let favorites = [];
-
-function addToFavorites(promptName) {
-    if (!favorites.includes(promptName)) {
-        favorites.push(promptName);
-        renderFavorites();
+// Utility functions for managing favorites
+function initFavorites() {
+    if (!localStorage.getItem('favorites')) {
+        localStorage.setItem('favorites', JSON.stringify([]));
     }
 }
 
-function removeFromFavorites(promptName) {
-    favorites = favorites.filter(fav => fav !== promptName);
+function getFavorites() {
+    return JSON.parse(localStorage.getItem('favorites') || '[]');
+}
+
+function copyToClipboard(text) {
+    fetch("/prompts/" + text)
+        .then(response => response.text())
+        .then(content => {
+            navigator.clipboard.writeText(content).then(() => {
+                const toastEl = document.getElementById('copyToast');
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            });
+        });
+}
+
+function addToFavorites(name) {
+    const favorites = getFavorites();
+    if (!favorites.includes(name)) {
+        favorites.push(name);
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        renderFavorites();
+        
+        const toastEl = document.getElementById('favToast');
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+}
+
+function removeFromFavorites(name) {
+    const favorites = getFavorites();
+    const newFavorites = favorites.filter(fav => fav !== name);
+    localStorage.setItem('favorites', JSON.stringify(newFavorites));
     renderFavorites();
 }
 
 function renderFavorites() {
+    const favorites = getFavorites();
     const favoritesList = document.getElementById('favorites-list');
-    favoritesList.innerHTML = '';
-    favorites.forEach(fav => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <a href="/prompts/${fav}">${fav}</a>
-            <span class="clipboard-icon" onclick="copyToClipboard('/prompts/${fav}')">📋</span>
-            <span class="remove-icon" onclick="removeFromFavorites('${fav}')">-</span>
-        `;
-        favoritesList.appendChild(li);
-    });
+    if (!favoritesList) return;
+    
+    favoritesList.innerHTML = favorites.length === 0 
+        ? '<p class="text-muted mb-0">No favorites yet</p>'
+        : favorites.map(fav => `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <a href="/prompts/${fav}" class="text-decoration-none">${fav}</a>
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary me-2" onclick="copyToClipboard('${fav}')">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="removeFromFavorites('${fav}')">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
 }
 
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(function() {
-        alert('Copied to clipboard');
-    }, function(err) {
-        alert('Failed to copy: ', err);
-    });
-}
+// Initialize favorites when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initFavorites();
+    renderFavorites();
+});

@@ -15,29 +15,21 @@ import (
 
 func copyToClipboard(text string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_copyToClipboard_1f38`,
-		Function: `function __templ_copyToClipboard_1f38(text){fetch("/prompts/" + text)
-		.then(response => response.text())
-		.then(content => {
-			navigator.clipboard.writeText(content).then(() => {
-				const toastEl = document.getElementById('copyToast');
-				const toast = new bootstrap.Toast(toastEl);
-				toast.show();
-			});
-		});
+		Name: `__templ_copyToClipboard_c982`,
+		Function: `function __templ_copyToClipboard_c982(text){copyToClipboard(text)
 }`,
-		Call:       templ.SafeScript(`__templ_copyToClipboard_1f38`, text),
-		CallInline: templ.SafeScriptInline(`__templ_copyToClipboard_1f38`, text),
+		Call:       templ.SafeScript(`__templ_copyToClipboard_c982`, text),
+		CallInline: templ.SafeScriptInline(`__templ_copyToClipboard_c982`, text),
 	}
 }
 
 func addToFavorites(name string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_addToFavorites_8a00`,
-		Function: `function __templ_addToFavorites_8a00(name){// TODO: Implement favorites functionality
+		Name: `__templ_addToFavorites_543a`,
+		Function: `function __templ_addToFavorites_543a(name){addToFavorites(name)
 }`,
-		Call:       templ.SafeScript(`__templ_addToFavorites_8a00`, name),
-		CallInline: templ.SafeScriptInline(`__templ_addToFavorites_8a00`, name),
+		Call:       templ.SafeScript(`__templ_addToFavorites_543a`, name),
+		CallInline: templ.SafeScriptInline(`__templ_addToFavorites_543a`, name),
 	}
 }
 
@@ -74,7 +66,7 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"toast-container position-fixed bottom-0 end-0 p-3\"><div id=\"copyToast\" class=\"toast align-items-center text-bg-success\" role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\"><div class=\"d-flex\"><div class=\"toast-body\"><i class=\"bi bi-clipboard-check me-2\"></i>Prompt copied to clipboard!</div><button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button></div></div></div><div class=\"row g-4\"><div class=\"col-12 col-lg-8\"><div class=\"mb-4\"><div class=\"input-group\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input type=\"search\" placeholder=\"Search prompts...\" class=\"form-control\" hx-get=\"/search\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"#prompt-list\"></div></div><div id=\"prompt-list\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script src=\"/static/js/favorites.js\"></script> <div class=\"toast-container position-fixed bottom-0 end-0 p-3\"><div id=\"copyToast\" class=\"toast align-items-center text-bg-success\" role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\"><div class=\"d-flex\"><div class=\"toast-body\"><i class=\"bi bi-clipboard-check me-2\"></i>Prompt copied to clipboard!</div><button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button></div></div><div id=\"favToast\" class=\"toast align-items-center text-bg-primary\" role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\"><div class=\"d-flex\"><div class=\"toast-body\"><i class=\"bi bi-star-fill me-2\"></i>Added to favorites!</div><button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button></div></div></div><div class=\"row g-4\"><div class=\"col-12 col-lg-8\"><div class=\"mb-4\"><div class=\"input-group\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input type=\"search\" placeholder=\"Search prompts...\" class=\"form-control\" hx-get=\"/search\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"#prompt-list\"></div></div><div id=\"prompt-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -87,7 +79,7 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(group)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 58, Col: 36}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 59, Col: 36}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -114,7 +106,7 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 						var templ_7745c5c3_Var5 string
 						templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.Name)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 65, Col: 26}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 66, Col: 26}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 						if templ_7745c5c3_Err != nil {
@@ -165,7 +157,7 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 					}
 				}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"col-12 col-lg-4\"><div id=\"prompt-content\" class=\"card\"><div class=\"card-body\"><p class=\"text-muted\">Select a prompt to view its details</p></div></div></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"col-12 col-lg-4\"><div id=\"prompt-content\" class=\"card mb-4\"><div class=\"card-body\"><p class=\"text-muted\">Select a prompt to view its details</p></div></div><div class=\"card\"><div class=\"card-header d-flex justify-content-between align-items-center\"><h5 class=\"mb-0\">Favorites</h5></div><div class=\"card-body\" id=\"favorites-list\"><p class=\"text-muted mb-0\">No favorites yet</p></div></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

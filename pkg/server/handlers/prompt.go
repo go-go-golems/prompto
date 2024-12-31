@@ -147,16 +147,23 @@ func (h *Handlers) PromptContent() http.HandlerFunc {
 func (h *Handlers) Search() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query().Get("q")
-		if query == "" {
-			return
-		}
-
 		var matchingPrompts []pkg.Prompto
-		for _, repo := range h.state.Repos {
-			for _, prompt := range repo.GetPromptos() {
-				if strings.Contains(strings.ToLower(prompt.Name), strings.ToLower(query)) ||
-					strings.Contains(strings.ToLower(prompt.Group), strings.ToLower(query)) {
-					matchingPrompts = append(matchingPrompts, prompt)
+
+		if query == "" {
+			// Show all prompts when query is empty
+			repoNames := h.state.GetAllRepositories()
+			for _, repoName := range repoNames {
+				repo := h.state.Repos[repoName]
+				matchingPrompts = append(matchingPrompts, repo.GetPromptos()...)
+			}
+		} else {
+			// Search for matching prompts
+			for _, repo := range h.state.Repos {
+				for _, prompt := range repo.GetPromptos() {
+					if strings.Contains(strings.ToLower(prompt.Name), strings.ToLower(query)) ||
+						strings.Contains(strings.ToLower(prompt.Group), strings.ToLower(query)) {
+						matchingPrompts = append(matchingPrompts, prompt)
+					}
 				}
 			}
 		}

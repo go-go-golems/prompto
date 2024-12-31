@@ -11,6 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"github.com/go-go-golems/prompto/pkg"
 	"github.com/go-go-golems/prompto/pkg/server/templates"
+	"github.com/go-go-golems/prompto/pkg/server/templates/components"
 )
 
 func copyToClipboard(text string) templ.ComponentScript {
@@ -66,95 +67,14 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script src=\"/static/js/favorites.js\"></script> <div class=\"toast-container position-fixed bottom-0 end-0 p-3\"><div id=\"copyToast\" class=\"toast align-items-center text-bg-success\" role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\"><div class=\"d-flex\"><div class=\"toast-body\"><i class=\"bi bi-clipboard-check me-2\"></i>Prompt copied to clipboard!</div><button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button></div></div><div id=\"favToast\" class=\"toast align-items-center text-bg-primary\" role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\"><div class=\"d-flex\"><div class=\"toast-body\"><i class=\"bi bi-star-fill me-2\"></i>Added to favorites!</div><button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button></div></div></div><div class=\"row g-4\"><div class=\"col-12 col-lg-8\"><div class=\"mb-4\"><div class=\"input-group\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input type=\"search\" placeholder=\"Search prompts...\" class=\"form-control\" hx-get=\"/search\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"#prompt-list\"></div></div><div id=\"prompt-list\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script src=\"/static/js/favorites.js\"></script> <div class=\"toast-container position-fixed bottom-0 end-0 p-3\"><div id=\"copyToast\" class=\"toast align-items-center text-bg-success\" role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\"><div class=\"d-flex\"><div class=\"toast-body\"><i class=\"bi bi-clipboard-check me-2\"></i>Prompt copied to clipboard!</div><button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button></div></div><div id=\"favToast\" class=\"toast align-items-center text-bg-primary\" role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\"><div class=\"d-flex\"><div class=\"toast-body\"><i class=\"bi bi-star-fill me-2\"></i>Added to favorites!</div><button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button></div></div></div><div class=\"row g-4\"><div class=\"col-12 col-lg-8\"><div class=\"mb-4\"><div class=\"input-group\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input type=\"search\" placeholder=\"Search prompts...\" class=\"form-control\" hx-get=\"/search\" name=\"q\" hx-trigger=\"keyup changed delay:200ms\" hx-target=\"#prompt-list\" hx-get-oob=\"true\" hx-get-oob-swap=\"true\" hx-get-oob-url=\"/\"></div></div><div id=\"prompt-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, repo := range repositories {
-				for _, group := range repos[repo].GetGroups() {
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"card mb-4\"><div class=\"card-header\"><h3 class=\"h5 mb-0\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var3 string
-					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(group)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 59, Col: 36}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h3></div><div class=\"list-group list-group-flush\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					for _, prompt := range repos[repo].GetPromptosByGroup(group) {
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"list-group-item\"><div class=\"d-flex justify-content-between align-items-center\"><a href=\"")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						var templ_7745c5c3_Var4 templ.SafeURL = templ.SafeURL("/prompts/" + prompt.Name)
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var4)))
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"text-decoration-none\">")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						var templ_7745c5c3_Var5 string
-						templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.Name)
-						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 66, Col: 26}
-						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</a><div>")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, copyToClipboard(prompt.Name))
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"btn btn-sm btn-outline-secondary me-2\" onclick=\"")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						var templ_7745c5c3_Var6 templ.ComponentScript = copyToClipboard(prompt.Name)
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6.Call)
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><i class=\"bi bi-clipboard\"></i></button> ")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, addToFavorites(prompt.Name))
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button class=\"btn btn-sm btn-outline-primary\" onclick=\"")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						var templ_7745c5c3_Var7 templ.ComponentScript = addToFavorites(prompt.Name)
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7.Call)
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><i class=\"bi bi-plus-lg\"></i></button></div></div></div>")
-						if templ_7745c5c3_Err != nil {
-							return templ_7745c5c3_Err
-						}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
+				templ_7745c5c3_Err = components.PromptList(repos[repo].GetPromptos()).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
 				}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"col-12 col-lg-4\"><div id=\"prompt-content\" class=\"card mb-4\"><div class=\"card-body\"><p class=\"text-muted\">Select a prompt to view its details</p></div></div><div class=\"card\"><div class=\"card-header d-flex justify-content-between align-items-center\"><h5 class=\"mb-0\">Favorites</h5></div><div class=\"card-body\" id=\"favorites-list\"><p class=\"text-muted mb-0\">No favorites yet</p></div></div></div></div>")

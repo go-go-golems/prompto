@@ -1,14 +1,14 @@
 module github.com/go-go-golems/prompto
 
-go 1.22
+go 1.23
 
 toolchain go1.23.3
 
 require (
 	github.com/a-h/templ v0.2.793
 	github.com/charmbracelet/huh v0.6.0
-	github.com/go-go-golems/clay v0.1.17
-	github.com/go-go-golems/glazed v0.5.18
+	github.com/go-go-golems/clay v0.1.20
+	github.com/go-go-golems/glazed v0.5.23
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.1

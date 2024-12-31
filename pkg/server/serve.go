@@ -13,7 +13,6 @@ import (
 	"github.com/go-go-golems/glazed/pkg/helpers/templating"
 	"github.com/go-go-golems/prompto/pkg"
 	"github.com/rs/zerolog/log"
-	"github.com/spf13/viper"
 )
 
 type ServerState struct {
@@ -34,7 +33,6 @@ func (s *ServerState) LoadRepositories() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.Repositories = viper.GetStringSlice("repositories")
 	for _, repoPath := range s.Repositories {
 		repo := pkg.NewRepository(repoPath)
 		err := repo.LoadPromptos()
@@ -179,8 +177,9 @@ func (s *ServerState) WatchRepositories(ctx context.Context) error {
 	return nil
 }
 
-func Serve(port int, watching bool) error {
+func Serve(port int, watching bool, repositories []string) error {
 	state := NewServerState(watching)
+	state.Repositories = repositories
 	if err := state.LoadRepositories(); err != nil {
 		return fmt.Errorf("error loading repositories: %w", err)
 	}

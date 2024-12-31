@@ -14,6 +14,9 @@ func (h *Handlers) Index() http.HandlerFunc {
 		}
 
 		component := pages.Index(h.state.GetAllRepositories(), h.state.Repos)
-		component.Render(r.Context(), w)
+		err := component.Render(r.Context(), w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }

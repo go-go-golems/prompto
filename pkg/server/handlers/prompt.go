@@ -29,7 +29,10 @@ func (h *Handlers) PromptList() http.HandlerFunc {
 
 		prompts := repository.GetPromptosByGroup(group)
 		component := components.PromptList(prompts)
-		component.Render(r.Context(), w)
+		err := component.Render(r.Context(), w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -54,7 +57,10 @@ func (h *Handlers) PromptContent() http.HandlerFunc {
 				allPrompts = append(allPrompts, repo.GetPromptos()...)
 			}
 			component := components.PromptList(allPrompts)
-			component.Render(r.Context(), w)
+			err := component.Render(r.Context(), w)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -74,7 +80,10 @@ func (h *Handlers) PromptContent() http.HandlerFunc {
 			}
 
 			component := components.PromptList(prompts)
-			component.Render(r.Context(), w)
+			err := component.Render(r.Context(), w)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -153,6 +162,9 @@ func (h *Handlers) Search() http.HandlerFunc {
 		}
 
 		component := components.PromptList(matchingPrompts)
-		component.Render(r.Context(), w)
+		err := component.Render(r.Context(), w)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }

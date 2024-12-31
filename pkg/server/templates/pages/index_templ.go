@@ -15,13 +15,19 @@ import (
 
 func copyToClipboard(text string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_copyToClipboard_f3f9`,
-		Function: `function __templ_copyToClipboard_f3f9(text){navigator.clipboard.writeText(text).then(() => {
-		// Could add a toast notification here
-	});
+		Name: `__templ_copyToClipboard_1f38`,
+		Function: `function __templ_copyToClipboard_1f38(text){fetch("/prompts/" + text)
+		.then(response => response.text())
+		.then(content => {
+			navigator.clipboard.writeText(content).then(() => {
+				const toastEl = document.getElementById('copyToast');
+				const toast = new bootstrap.Toast(toastEl);
+				toast.show();
+			});
+		});
 }`,
-		Call:       templ.SafeScript(`__templ_copyToClipboard_f3f9`, text),
-		CallInline: templ.SafeScriptInline(`__templ_copyToClipboard_f3f9`, text),
+		Call:       templ.SafeScript(`__templ_copyToClipboard_1f38`, text),
+		CallInline: templ.SafeScriptInline(`__templ_copyToClipboard_1f38`, text),
 	}
 }
 
@@ -68,7 +74,7 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"row g-4\"><div class=\"col-12 col-lg-8\"><div class=\"mb-4\"><div class=\"input-group\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input type=\"search\" placeholder=\"Search prompts...\" class=\"form-control\" hx-get=\"/search\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"#prompt-list\"></div></div><div id=\"prompt-list\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"toast-container position-fixed bottom-0 end-0 p-3\"><div id=\"copyToast\" class=\"toast align-items-center text-bg-success\" role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\"><div class=\"d-flex\"><div class=\"toast-body\"><i class=\"bi bi-clipboard-check me-2\"></i>Prompt copied to clipboard!</div><button type=\"button\" class=\"btn-close btn-close-white me-2 m-auto\" data-bs-dismiss=\"toast\" aria-label=\"Close\"></button></div></div></div><div class=\"row g-4\"><div class=\"col-12 col-lg-8\"><div class=\"mb-4\"><div class=\"input-group\"><span class=\"input-group-text\"><i class=\"bi bi-search\"></i></span> <input type=\"search\" placeholder=\"Search prompts...\" class=\"form-control\" hx-get=\"/search\" hx-trigger=\"keyup changed delay:500ms\" hx-target=\"#prompt-list\"></div></div><div id=\"prompt-list\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -81,7 +87,7 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(group)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 42, Col: 36}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 58, Col: 36}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -108,7 +114,7 @@ func Index(repositories []string, repos map[string]*pkg.Repository) templ.Compon
 						var templ_7745c5c3_Var5 string
 						templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(prompt.Name)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 49, Col: 26}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/server/templates/pages/index.templ`, Line: 65, Col: 26}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 						if templ_7745c5c3_Err != nil {

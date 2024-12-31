@@ -10,11 +10,22 @@ function getFavorites() {
 }
 
 function copyToClipboard(text) {
-    fetch("/prompts/" + text)
-        .then(response => response.text())
-        .then(content => {
-            navigator.clipboard.writeText(content).then(() => {
+    fetch("/prompts/" + text, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+        .then(response => response.json())
+        .then(data => {
+            navigator.clipboard.writeText(data.content).then(() => {
                 const toastEl = document.getElementById('copyToast');
+                const toastBody = toastEl.querySelector('.toast-body');
+                toastBody.innerHTML = `
+                    <i class="bi bi-clipboard-check me-2"></i>Copied to clipboard!<br>
+                    <small class="text-white-50">
+                        ${data.stats.tokens} tokens • ${data.stats.lines} lines • ${data.stats.size} bytes
+                    </small>
+                `;
                 const toast = new bootstrap.Toast(toastEl);
                 toast.show();
             });

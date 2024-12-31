@@ -5,6 +5,7 @@ go 1.22
 toolchain go1.23.3
 
 require (
+	github.com/a-h/templ v0.2.793
 	github.com/charmbracelet/huh v0.6.0
 	github.com/go-go-golems/clay v0.1.17
 	github.com/go-go-golems/glazed v0.5.18
@@ -12,6 +13,7 @@ require (
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
+	github.com/weaviate/tiktoken-go v0.0.2
 )
 
 require (
@@ -19,7 +21,6 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
-	github.com/a-h/templ v0.2.793 // indirect
 	github.com/adrg/frontmatter v0.2.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect

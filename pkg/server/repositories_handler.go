@@ -3,13 +3,13 @@ package server
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/go-go-golems/prompto/pkg/server/state"
 )
 
-func repositoriesHandler(state *ServerState) http.HandlerFunc {
+func repositoriesHandler(state_ *state.ServerState) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		state.mu.RLock()
-		repos := state.Repositories
-		state.mu.RUnlock()
+		repos := state_.Repositories
 
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(repos)

@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	"github.com/go-go-golems/prompto/pkg"
+	"github.com/go-go-golems/prompto/pkg/server/state"
 )
 
-func promptHandler(state *ServerState) http.HandlerFunc {
+func promptHandler(state_ *state.ServerState) http.HandlerFunc {
 	listTmpl := template.Must(template.New("promptList").Parse(`
 		<ul id="content-list">
 			{{range .}}
@@ -25,9 +26,7 @@ func promptHandler(state *ServerState) http.HandlerFunc {
 		if len(parts) == 1 {
 			// Directory listing
 			group := parts[0]
-			state.mu.RLock()
-			files := state.GetPromptosByGroup(group)
-			state.mu.RUnlock()
+			files := state_.GetPromptosByGroup(group)
 
 			w.Header().Set("Content-Type", "text/html")
 			err := listTmpl.Execute(w, files)
@@ -46,9 +45,7 @@ func promptHandler(state *ServerState) http.HandlerFunc {
 		group := parts[0]
 		promptName := path
 
-		state.mu.RLock()
-		files := state.GetPromptosByGroup(group)
-		state.mu.RUnlock()
+		files := state_.GetPromptosByGroup(group)
 
 		var foundFile pkg.Prompto
 		for _, file := range files {

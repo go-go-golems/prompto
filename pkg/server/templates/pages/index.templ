@@ -1,0 +1,94 @@
+package pages
+
+import (
+	"github.com/go-go-golems/prompto/pkg"
+	"github.com/go-go-golems/prompto/pkg/server/templates"
+)
+
+script copyToClipboard(text string) {
+	navigator.clipboard.writeText(text).then(() => {
+		// Could add a toast notification here
+	});
+}
+
+script addToFavorites(name string) {
+	// TODO: Implement favorites functionality
+}
+
+templ Index(repositories []string, repos map[string]*pkg.Repository) {
+	@templates.Layout() {
+		<div class="row g-4">
+			<div class="col-12 col-lg-8">
+				<div class="mb-4">
+					<div class="input-group">
+						<span class="input-group-text">
+							<i class="bi bi-search"></i>
+						</span>
+						<input
+							type="search"
+							placeholder="Search prompts..."
+							class="form-control"
+							hx-get="/search"
+							hx-trigger="keyup changed delay:500ms"
+							hx-target="#prompt-list"
+						/>
+					</div>
+				</div>
+				<div id="prompt-list">
+					for _, repo := range repositories {
+						for _, group := range repos[repo].GetGroups() {
+							<div class="card mb-4">
+								<div class="card-header">
+									<h3 class="h5 mb-0">{ group }</h3>
+								</div>
+								<div class="list-group list-group-flush">
+									for _, prompt := range repos[repo].GetPromptosByGroup(group) {
+										<div class="list-group-item">
+											<div class="d-flex justify-content-between align-items-center">
+												<a href={ templ.SafeURL("/prompts/" + prompt.Name) } class="text-decoration-none">
+													{ prompt.Name }
+												</a>
+												<div>
+													<button
+														class="btn btn-sm btn-outline-secondary me-2"
+														onclick={ copyToClipboard(prompt.Name) }
+													>
+														<i class="bi bi-clipboard"></i>
+													</button>
+													<button
+														class="btn btn-sm btn-outline-primary"
+														onclick={ addToFavorites(prompt.Name) }
+													>
+														<i class="bi bi-plus-lg"></i>
+													</button>
+												</div>
+											</div>
+										</div>
+									}
+								</div>
+							</div>
+						}
+					}
+				</div>
+			</div>
+			<div class="col-12 col-lg-4">
+				<div id="prompt-content" class="card">
+					<div class="card-body">
+						<p class="text-muted">Select a prompt to view its details</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			function copyToClipboard(text) {
+				navigator.clipboard.writeText(text).then(() => {
+					// Could add a toast notification here
+				});
+			}
+
+			function addToFavorites(name) {
+				// TODO: Implement favorites functionality
+			}
+		</script>
+	}
+}

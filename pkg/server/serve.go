@@ -2,12 +2,17 @@ package server
 
 import (
 	"context"
+	"embed"
 	"fmt"
+	"io/fs"
 	"net/http"
 
 	"github.com/go-go-golems/prompto/pkg/server/handlers"
 	"github.com/go-go-golems/prompto/pkg/server/state"
 )
+
+//go:embed static
+var staticFiles embed.FS
 
 func Serve(port int, watching bool, repositories []string) error {
 	state := state.NewServerState(watching)
@@ -36,9 +41,12 @@ func Serve(port int, watching bool, repositories []string) error {
 	mux.Handle("/refresh", h.Refresh())
 	mux.Handle("/repositories", h.Repositories())
 
-	// Serve static files
-	fs := http.FileServer(http.Dir("pkg/server/static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	// Serve embedded static files
+	staticFS, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		return fmt.Errorf("error setting up static file system: %w", err)
+	}
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	fmt.Printf("Server is running on http://localhost:%d\n", port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), mux)

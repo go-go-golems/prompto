@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	clay "github.com/go-go-golems/clay/pkg"
 	"os"
+
+	clay "github.com/go-go-golems/clay/pkg"
 
 	"github.com/go-go-golems/glazed/pkg/help"
 	"github.com/go-go-golems/prompto/cmd/prompto/cmds"
@@ -17,12 +18,6 @@ var rootCmd = &cobra.Command{
 	Short: "prompto generates prompts from a list of repositories",
 	Long: `This program loads a list of repositories from a yaml config file
 and looks for a file that matches the prompt.`,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		// reinitialize the logger because we can now parse --log-level and co
-		// from the command line flag
-		err := clay.InitLogger()
-		cobra.CheckErr(err)
-	},
 }
 
 func initRootCmd() (*help.HelpSystem, error) {
@@ -33,8 +28,6 @@ func initRootCmd() (*help.HelpSystem, error) {
 	helpSystem.SetupCobraRootCommand(rootCmd)
 
 	err = clay.InitViper("prompto", rootCmd)
-	cobra.CheckErr(err)
-	err = clay.InitLogger()
 	cobra.CheckErr(err)
 
 	return helpSystem, nil

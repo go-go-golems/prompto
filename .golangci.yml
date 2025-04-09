@@ -1,22 +1,32 @@
+version: "2"
+
 linters:
-  disable-all: false
+  default: none
   enable:
     # defaults
     - errcheck
-    - gosimple
     - govet
     - ineffassign
     - staticcheck
-    - typecheck
     - unused
-    # stuff I'm adding
+    # additional linters
     - exhaustive
-    #    - gochecknoglobals
-    #    - gochecknoinits
-    - gofmt
     - nonamedreturns
     - predeclared
-  fast: false
+
+formatters:
+  enable:
+    - gofmt
+
+linters-settings:
+  govet:
+    check-shadowing: true
+  staticcheck:
+    go: "1.21"
+
 issues:
-  exclude:
-    - 'SA1019: cli.CreateProcessorLegacy'
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec

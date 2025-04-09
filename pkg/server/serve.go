@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
+	"time"
 
 	"github.com/go-go-golems/prompto/pkg/server/handlers"
 	"github.com/go-go-golems/prompto/pkg/server/state"
@@ -48,6 +49,16 @@ func Serve(port int, watching bool, repositories []string) error {
 	}
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
+	// Create server with timeouts
+	srv := &http.Server{
+		Addr:              fmt.Sprintf(":%d", port),
+		Handler:           mux,
+		ReadTimeout:       5 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       120 * time.Second,
+		ReadHeaderTimeout: 2 * time.Second,
+	}
+
 	fmt.Printf("Server is running on http://localhost:%d\n", port)
-	return http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
+	return srv.ListenAndServe()
 }

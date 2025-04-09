@@ -14,19 +14,22 @@ builds:
     binary: prompto
     goos:
       - linux
-# I am not able to test windows at the time
-#      - windows
+      # I am not able to test windows at the time
+      #      - windows
       - darwin
+    goarch:
+      - amd64
+      - arm64
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - "^docs:"
+      - "^test:"
 brews:
   - name: prompto
     description: "prompto is a tool"
@@ -37,8 +40,7 @@ brews:
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
 nfpms:
-  -
-    id: packages
+  - id: packages
 
     vendor: GO GO GOLEMS
     homepage: https://github.com/go-go-golems/
@@ -79,7 +81,6 @@ publishers:
       - packages
     dir: "{{ dir .ArtifactPath }}"
     cmd: curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/go-go-golems/
-
 # modelines, feel free to remove those if you don't want/use them:
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj

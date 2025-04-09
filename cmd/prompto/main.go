@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	clay "github.com/go-go-golems/clay/pkg"
 	"os"
 
+	clay "github.com/go-go-golems/clay/pkg"
+	clay_repositories "github.com/go-go-golems/clay/pkg/cmds/repositories"
+	"github.com/go-go-golems/glazed/pkg/cmds/logging"
 	"github.com/go-go-golems/glazed/pkg/help"
 	"github.com/go-go-golems/prompto/cmd/prompto/cmds"
 	"github.com/go-go-golems/prompto/pkg/doc"
@@ -17,11 +19,13 @@ var rootCmd = &cobra.Command{
 	Short: "prompto generates prompts from a list of repositories",
 	Long: `This program loads a list of repositories from a yaml config file
 and looks for a file that matches the prompt.`,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		// reinitialize the logger because we can now parse --log-level and co
-		// from the command line flag
-		err := clay.InitLogger()
-		cobra.CheckErr(err)
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		err := logging.InitLoggerFromViper()
+		if err != nil {
+			return err
+		}
+
+		return nil
 	},
 }
 
@@ -34,8 +38,8 @@ func initRootCmd() (*help.HelpSystem, error) {
 
 	err = clay.InitViper("prompto", rootCmd)
 	cobra.CheckErr(err)
-	err = clay.InitLogger()
-	cobra.CheckErr(err)
+
+	rootCmd.AddCommand(clay_repositories.NewRepositoriesGroupCommand())
 
 	return helpSystem, nil
 }
@@ -59,10 +63,6 @@ func main() {
 	for _, cmd := range cmds.NewCommands(options) {
 		rootCmd.AddCommand(cmd)
 	}
-
-	configCmd, err := cmds.NewConfigGroupCommand(helpSystem)
-	cobra.CheckErr(err)
-	rootCmd.AddCommand(configCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

@@ -36,16 +36,13 @@ goreleaser:
 	goreleaser release --skip=sign --snapshot --clean
 
 tag-major:
-	git tag -a $$(svu major) -m "Release $$(svu major)"
-	git push origin $$(svu major)
+	git tag $(shell svu major)
 
 tag-minor:
-	git tag -a $$(svu minor) -m "Release $$(svu minor)"
-	git push origin $$(svu minor)
+	git tag $(shell svu minor)
 
 tag-patch:
-	git tag -a $$(svu patch) -m "Release $$(svu patch)"
-	git push origin $$(svu patch)
+	git tag $(shell svu patch)
 
 release:
 	git push --tags

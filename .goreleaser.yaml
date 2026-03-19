@@ -8,46 +8,63 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - env:
+  - id: prompto-linux
+    env:
       - CGO_ENABLED=0
     main: ./cmd/prompto
     binary: prompto
     goos:
       - linux
-      # I am not able to test windows at the time
-      #      - windows
+# I am not able to test windows at the time
+#      - windows
+    goarch:
+      - amd64
+      - arm64
+  - id: prompto-darwin
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/prompto
+    binary: prompto
+    goos:
       - darwin
     goarch:
       - amd64
       - arm64
 checksum:
-  name_template: "checksums.txt"
+  name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-      - "^docs:"
-      - "^test:"
+      - '^docs:'
+      - '^test:'
+
+signs:
+  - artifacts: checksum
+    # setup for github actions according to https://goreleaser.com/ci/actions/
+    args: [ "--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
+
 brews:
   - name: prompto
-    description: "prompto is a tool"
-    homepage: "https://github.com/go-go-golems/XXX"
+    description: "Quickly get custom prompt contexts"
+    homepage: "https://github.com/go-go-golems/prompto"
     repository:
       owner: go-go-golems
       name: homebrew-go-go-go
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
 nfpms:
-  - id: packages
+  -
+    id: packages
 
     vendor: GO GO GOLEMS
-    homepage: https://github.com/go-go-golems/
+    homepage: https://github.com/go-go-golems/prompto
     maintainer: Manuel Odendahl <wesen@ruinwesen.com>
 
     description: |-
-      prompto is a tool to quickly create prompt contexts for LLM prompting.
+      prompto is a tool
 
     license: MIT
 
@@ -81,6 +98,7 @@ publishers:
       - packages
     dir: "{{ dir .ArtifactPath }}"
     cmd: curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/go-go-golems/
+
 # modelines, feel free to remove those if you don't want/use them:
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj

@@ -2,11 +2,11 @@ name: "CodeQL Analysis"
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   schedule:
-    - cron: "0 0 * * 0" # Run weekly on Sunday at midnight
+    - cron: '0 0 * * 0'  # Run weekly on Sunday at midnight
 
 jobs:
   analyze:
@@ -14,15 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-
+      
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v6
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: go
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: go
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v4 

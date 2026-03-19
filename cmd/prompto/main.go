@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	clay "github.com/go-go-golems/clay/pkg"
 	clay_repositories "github.com/go-go-golems/clay/pkg/cmds/repositories"
 	"github.com/go-go-golems/glazed/pkg/cmds/logging"
 	"github.com/go-go-golems/glazed/pkg/help"
+	helpCmd "github.com/go-go-golems/glazed/pkg/help/cmd"
 	"github.com/go-go-golems/prompto/cmd/prompto/cmds"
 	"github.com/go-go-golems/prompto/pkg/doc"
 	"github.com/spf13/cobra"
@@ -20,12 +22,7 @@ var rootCmd = &cobra.Command{
 	Long: `This program loads a list of repositories from a yaml config file
 and looks for a file that matches the prompt.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		err := logging.InitLoggerFromViper()
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return logging.InitLoggerFromCobra(cmd)
 	},
 }
 
@@ -34,9 +31,9 @@ func initRootCmd() (*help.HelpSystem, error) {
 	err := doc.AddDocToHelpSystem(helpSystem)
 	cobra.CheckErr(err)
 
-	helpSystem.SetupCobraRootCommand(rootCmd)
+	helpCmd.SetupCobraRootCommand(helpSystem, rootCmd)
 
-	err = clay.InitViper("prompto", rootCmd)
+	err = clay.InitGlazed("prompto", rootCmd)
 	cobra.CheckErr(err)
 
 	rootCmd.AddCommand(clay_repositories.NewRepositoriesGroupCommand())
@@ -53,6 +50,9 @@ func main() {
 
 	viper.SetConfigName("config")
 	viper.AddConfigPath(os.ExpandEnv("$HOME/.prompto"))
+	viper.SetEnvPrefix("prompto")
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	viper.AutomaticEnv()
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf("Error reading config file, %s", err)
 	}

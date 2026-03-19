@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	"github.com/go-go-golems/glazed/pkg/cmds"
-	"github.com/go-go-golems/glazed/pkg/cmds/layers"
-	parameters2 "github.com/go-go-golems/glazed/pkg/cmds/parameters"
+	"github.com/go-go-golems/glazed/pkg/cmds/fields"
+	"github.com/go-go-golems/glazed/pkg/cmds/schema"
+	"github.com/go-go-golems/glazed/pkg/cmds/values"
 	"github.com/pkg/errors"
 )
 
@@ -56,43 +57,43 @@ func (p *Prompto) Render(repo string, restArgs []string) (string, error) {
 	case TemplateCommand:
 		buf := &strings.Builder{}
 
-		parsedLayers := layers.NewParsedLayers()
-		err := p.Command.Layers.ForEachE(func(_ string, l layers.ParameterLayer) error {
-			parameters := l.GetParameterDefinitions()
+		parsedValues := values.New()
+		err := p.Command.Schema.ForEachE(func(_ string, section schema.Section) error {
+			definitions := section.GetDefinitions()
 
-			parsedFlags, args_, err := parameters.GatherFlagsFromStringList(
+			parsedFlags, args_, err := definitions.GatherFlagsFromStringList(
 				restArgs, false, false, "",
-				parameters2.WithParseStepSource("command-line"),
+				fields.WithSource("command-line"),
 			)
 			if err != nil {
 				return err
 			}
 
-			arguments := parameters2.NewParsedParameters()
+			arguments := fields.NewFieldValues()
 			if len(args_) > 0 {
-				if l.GetSlug() != layers.DefaultSlug {
-					return errors.Errorf("layer %s does not accept arguments (only default layer can)", l.GetSlug())
+				if section.GetSlug() != schema.DefaultSlug {
+					return errors.Errorf("section %s does not accept arguments (only default section can)", section.GetSlug())
 				}
 
 				argumentDefinitions := p.Command.GetDefaultArguments()
 				arguments, err = argumentDefinitions.GatherArguments(
 					args_, false, false,
-					parameters2.WithParseStepSource("cli"),
+					fields.WithSource("cli"),
 				)
 				if err != nil {
 					return err
 				}
 			}
 
-			parsedLayer, err := layers.NewParsedLayer(l,
-				layers.WithParsedParameters(parsedFlags),
-				layers.WithParsedParameters(arguments),
+			sectionValues, err := values.NewSectionValues(section,
+				values.WithFields(parsedFlags),
+				values.WithFields(arguments),
 			)
 			if err != nil {
 				return err
 			}
 
-			parsedLayers.Set(l.GetSlug(), parsedLayer)
+			parsedValues.Set(section.GetSlug(), sectionValues)
 
 			return nil
 		})
@@ -100,7 +101,7 @@ func (p *Prompto) Render(repo string, restArgs []string) (string, error) {
 			return "", err
 		}
 
-		err = p.Command.RunIntoWriter(context.Background(), parsedLayers, buf)
+		err = p.Command.RunIntoWriter(context.Background(), parsedValues, buf)
 		if err != nil {
 			return "", err
 		}

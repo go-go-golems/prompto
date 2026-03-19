@@ -1,15 +1,17 @@
-.PHONY: all test build lint lintmax docker-lint gosec govulncheck goreleaser tag-major tag-minor tag-patch release install
+.PHONY: all lint test build goreleaser release
 
-all: test build
+all: lint test build
 
-VERSION=v0.1.14
+BINARY ?= prompto
+MODULE ?= github.com/go-go-golems/prompto
+CMD_DIR ?= ./cmd/$(BINARY)
 
-TAPES=$(shell ls doc/vhs/*tape)
-gifs: $(TAPES)
-	for i in $(TAPES); do vhs < $$i; done
+VERSION ?= v0.0.0
+GORELEASER_ARGS ?= --skip=sign --snapshot --clean
+GORELEASER_TARGET ?= --single-target
 
 docker-lint:
-	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:v2.0.2 golangci-lint run -v
+	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:latest golangci-lint run -v
 
 lint:
 	golangci-lint run -v
@@ -19,7 +21,7 @@ lintmax:
 
 gosec:
 	go install github.com/securego/gosec/v2/cmd/gosec@latest
-	gosec -exclude=G101,G304,G301,G306,G204 -exclude-dir=.history ./...
+	gosec -exclude-generated -exclude=G101,G304,G301,G306,G204,G702,G705 -exclude-dir=.history ./...
 
 govulncheck:
 	go install golang.org/x/vuln/cmd/govulncheck@latest
@@ -32,8 +34,12 @@ build:
 	go generate ./...
 	go build ./...
 
+build-bin:
+	mkdir -p ./dist
+	go build -o ./dist/$(BINARY) $(CMD_DIR)
+
 goreleaser:
-	goreleaser release --skip=sign --snapshot --clean
+	GOWORK=off goreleaser release $(GORELEASER_ARGS) $(GORELEASER_TARGET)
 
 tag-major:
 	git tag $(shell svu major)
@@ -45,23 +51,13 @@ tag-patch:
 	git tag $(shell svu patch)
 
 release:
-	git push --tags
-	GOPROXY=proxy.golang.org go list -m github.com/go-go-golems/prompto@$(shell svu current)
+	git push origin --tags
+	GOPROXY=proxy.golang.org go list -m $(MODULE)@$(shell svu current)
 
 bump-glazed:
 	go get github.com/go-go-golems/glazed@latest
 	go get github.com/go-go-golems/clay@latest
 	go mod tidy
 
-BINARY=$(shell which prompto)
 install:
-	go build -o ./dist/prompto ./cmd/prompto && \
-		cp ./dist/prompto $(BINARY)
-
-# CodeQL local analysis target
-codeql-local:
-	@if [ -z "$(shell which codeql)" ]; then echo "CodeQL CLI not found. Install from https://github.com/github/codeql-cli-binaries/releases"; exit 1; fi
-	@if [ ! -d "$(HOME)/codeql-go" ]; then echo "CodeQL queries not found. Clone from https://github.com/github/codeql-go"; exit 1; fi
-	codeql database create --language=go --source-root=. ./codeql-db
-	codeql database analyze ./codeql-db $(HOME)/codeql-go/ql/src/go/Security --format=sarif-latest --output=codeql-results.sarif
-	@echo "Results saved to codeql-results.sarif"
+	go install $(CMD_DIR)

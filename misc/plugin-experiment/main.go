@@ -3,9 +3,10 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/go-go-golems/glazed/pkg/cmds/layers"
-	"github.com/go-go-golems/glazed/pkg/cmds/parameters"
 	"os/exec"
+
+	"github.com/go-go-golems/glazed/pkg/cmds/fields"
+	"github.com/go-go-golems/glazed/pkg/cmds/schema"
 )
 
 func main() {
@@ -25,38 +26,40 @@ func main() {
 	fmt.Printf("YAML Output:\n%s\n", yamlOutput)
 	fmt.Println()
 
-	// Create a parameter layer from the YAML output
-	parameterLayer, err := layers.NewParameterLayerFromYAML(yamlOutput)
+	// Create a section from the YAML output
+	section, err := schema.NewSectionFromYAML(yamlOutput)
 	if err != nil {
-		fmt.Printf("Error creating parameter layer: %v\n", err)
+		fmt.Printf("Error creating section: %v\n", err)
 		return
 	}
 
-	// Access the parameter layer properties
-	fmt.Printf("Slug: %s\n", parameterLayer.Slug)
-	fmt.Printf("Name: %s\n", parameterLayer.Name)
-	fmt.Printf("Description: %s\n", parameterLayer.Description)
+	// Access the section properties
+	fmt.Printf("Slug: %s\n", section.Slug)
+	fmt.Printf("Name: %s\n", section.Name)
+	fmt.Printf("Description: %s\n", section.Description)
+
+	definitions := section.GetDefinitions()
 
 	fmt.Println("Flags:")
-	parameterLayer.ParameterDefinitions.ForEach(func(flag *parameters.ParameterDefinition) {
-		if !flag.IsArgument {
-			fmt.Printf("  - Name: %s\n", flag.Name)
-			fmt.Printf("    Type: %s\n", flag.Type)
-			fmt.Printf("    Help: %s\n", flag.Help)
-			if flag.Default != nil {
-				fmt.Printf("    Default: %v\n", *flag.Default)
+	definitions.ForEach(func(def *fields.Definition) {
+		if !def.IsArgument {
+			fmt.Printf("  - Name: %s\n", def.Name)
+			fmt.Printf("    Type: %s\n", def.Type)
+			fmt.Printf("    Help: %s\n", def.Help)
+			if def.Default != nil {
+				fmt.Printf("    Default: %v\n", *def.Default)
 			}
 		}
 	})
 
 	fmt.Println("Arguments:")
-	parameterLayer.ParameterDefinitions.ForEach(func(flag *parameters.ParameterDefinition) {
-		if flag.IsArgument {
-			fmt.Printf("  - Name: %s\n", flag.Name)
-			fmt.Printf("    Type: %s\n", flag.Type)
-			fmt.Printf("    Help: %s\n", flag.Help)
-			if flag.Default != nil {
-				fmt.Printf("    Default: %v\n", *flag.Default)
+	definitions.ForEach(func(def *fields.Definition) {
+		if def.IsArgument {
+			fmt.Printf("  - Name: %s\n", def.Name)
+			fmt.Printf("    Type: %s\n", def.Type)
+			fmt.Printf("    Help: %s\n", def.Help)
+			if def.Default != nil {
+				fmt.Printf("    Default: %v\n", *def.Default)
 			}
 		}
 	})

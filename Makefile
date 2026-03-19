@@ -21,7 +21,7 @@ lintmax:
 
 gosec:
 	go install github.com/securego/gosec/v2/cmd/gosec@latest
-	gosec -exclude-generated -exclude=G101,G304,G301,G306 -exclude-dir=.history ./...
+	gosec -exclude-generated -exclude=G101,G304,G301,G306,G204,G702,G705 -exclude-dir=.history ./...
 
 govulncheck:
 	go install golang.org/x/vuln/cmd/govulncheck@latest

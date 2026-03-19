@@ -1,6 +1,6 @@
 module github.com/go-go-golems/prompto
 
-go 1.25.7
+go 1.25.8
 
 require (
 	github.com/a-h/templ v0.3.833
